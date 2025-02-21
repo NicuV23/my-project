@@ -6,41 +6,44 @@ function CreateEventPage() {
   const [eventLocation, setEventLocation] = useState("");
   const [maxParticipants, setMaxParticipants] = useState("");
   const [gameTypeId, setGameTypeId] = useState("");
+  const [chatTypeId, setChatTypeId] = useState("");
   const [gameTypes, setGameTypes] = useState([]);
+  const [chatTypes, setChatTypes] = useState([]);
 
   useEffect(() => {
-    const fetchGameTypes = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch(`${apiBaseUrl}/game-types`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch game types");
+        const gameTypesResponse = await fetch(`${apiBaseUrl}/game-types`);
+        const chatTypesResponse = await fetch(`${apiBaseUrl}/chat`);
+        if (!gameTypesResponse.ok || !chatTypesResponse.ok) {
+          throw new Error("Failed to fetch data");
         }
-        const data = await response.json();
-        setGameTypes(data);
+        const gameTypesData = await gameTypesResponse.json();
+        const chatTypesData = await chatTypesResponse.json();
+        setGameTypes(gameTypesData);
+        setChatTypes(chatTypesData);
       } catch (error) {
-        console.error("Error fetching game types:", error);
+        console.error("Error fetching data:", error);
       }
     };
 
-    fetchGameTypes();
+    fetchData();
   }, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    const eventData = {
-      name: eventName,
-      location: eventLocation,
-      maxParticipants: parseInt(maxParticipants, 10),
-      gameTypeId: parseInt(gameTypeId, 10),
-    };
-
     try {
+      const eventData = {
+        name: eventName,
+        location: eventLocation,
+        maxParticipants: parseInt(maxParticipants, 10),
+        gameTypeId: parseInt(gameTypeId, 10),
+        chatId: parseInt(chatTypeId, 10),
+      };
+
       const response = await fetch(`${apiBaseUrl}/main-events`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(eventData),
       });
 
@@ -51,10 +54,9 @@ function CreateEventPage() {
       const result = await response.json();
       console.log("Event created successfully:", result);
     } catch (error) {
-      console.error("Error creating event:", error.message);
+      console.error("Error during event creation:", error.message);
     }
   };
-
   return (
     <div className="container">
       <h1>Create a New Event</h1>
@@ -111,6 +113,25 @@ function CreateEventPage() {
           >
             <option value="">Select Game Type</option>
             {gameTypes.map((type) => (
+              <option key={type.id} value={type.id}>
+                {type.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="mb-3">
+          <label htmlFor="chatTypeId" className="form-label">
+            Chat Type:
+          </label>
+          <select
+            className="form-select"
+            id="chatTypeId"
+            value={chatTypeId}
+            onChange={(e) => setChatTypeId(e.target.value)}
+            required
+          >
+            <option value="">Select Chat Type</option>
+            {chatTypes.map((type) => (
               <option key={type.id} value={type.id}>
                 {type.name}
               </option>

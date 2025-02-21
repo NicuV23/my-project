@@ -1,11 +1,8 @@
 package com.projectevents.entity;
 
-
+import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
-
-import jakarta.persistence.*;
-
 
 @Entity
 @Table(name = "chat")
@@ -17,6 +14,9 @@ public class Chat {
     @ManyToOne
     @JoinColumn(name = "event_id")
     private MainEvent event;
+
+    @Column(name = "name")
+    private String name;
 
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL)
     private Set<Message> messages = new HashSet<>();
@@ -35,15 +35,23 @@ public class Chat {
         return event;
     }
 
-     public void setEvent(MainEvent event) {
+    public void setEvent(MainEvent event) {
         this.event = event;
     }
 
-     Set<Message> getMessages() {
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Set<Message> getMessages() {
         return messages;
     }
 
-     void setMessages(Set<Message> messages) {
+    public void setMessages(Set<Message> messages) {
         this.messages = messages;
     }
 }

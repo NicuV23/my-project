@@ -6,15 +6,17 @@ public class MainEventDTO {
     private String location;
     private Integer maxParticipants;
     private Long gameTypeId; 
+    private Long chatId;
 
     public MainEventDTO() {}
 
-    public MainEventDTO(Long id, String name, String location, Integer maxParticipants, Long gameTypeId) {
+    public MainEventDTO(Long id, String name, String location, Integer maxParticipants, Long gameTypeId, Long chatId) {
         this.id = id;
         this.name = name;
         this.location = location;
         this.maxParticipants = maxParticipants;
         this.gameTypeId = gameTypeId;
+        this.chatId = chatId;
     }
 
     public Long getId() {
@@ -56,4 +58,15 @@ public class MainEventDTO {
     public void setGameTypeId(Long gameTypeId) {
         this.gameTypeId = gameTypeId;
     }
+    
+    public Long getChatId() {
+        return chatId;
+    }
+    
+    //testing commit
+
+    public void setChatId(Long chatId) {
+        this.chatId = chatId; 
+    }
 }
+

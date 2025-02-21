@@ -6,7 +6,7 @@ import com.projectevents.entity.MainEvent;
 public class MainEventConverter {
 
     public static MainEventDTO entityToDTO(MainEvent mainEvent) {
-        return new MainEventDTO(mainEvent.getEventId(), mainEvent.getName(), mainEvent.getLocation(), mainEvent.getMaxParticipants(), mainEvent.getGameTypeId());
+        return new MainEventDTO(mainEvent.getEventId(), mainEvent.getName(), mainEvent.getLocation(), mainEvent.getMaxParticipants(), mainEvent.getGameTypeId(),mainEvent.getChatId());
     }
 
     public static MainEvent dtoToEntity(MainEventDTO mainEventDTO) {

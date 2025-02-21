@@ -15,6 +15,9 @@ public class MainEvent {
 
     @Column(length = 50)
     private String name;
+    
+    @Column(name = "chat_id")
+    private Long chatId;
 
     @Column(length = 50)
     private String location;
@@ -69,6 +72,14 @@ public class MainEvent {
 
     public void setGameType(GameType gameType) {
         this.gameType = gameType;
+    }
+    
+    public Long getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(Long chatId) {
+        this.chatId = chatId;
     }
 
     public Set<Participant> getParticipants() {
