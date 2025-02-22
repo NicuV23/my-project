@@ -1,10 +1,19 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import { LoginForm } from "./LoginForm";
+import { useNavigate } from "react-router-dom";
 import { RegisterForm } from "./RegisterForm";
 import { ForgotPasswordForm } from "./ForgotPasswordForm";
 
-export const AuthContainer = () => {
-  const [currentView, setCurrentView] = React.useState("login");
+const AuthContainer = () => {
+  const [currentView, setCurrentView] = useState("login");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("jwt");
+    if (token) {
+      navigate("/home");
+    }
+  }, [navigate]);
 
   const renderForm = () => {
     switch (currentView) {
@@ -29,3 +38,5 @@ export const AuthContainer = () => {
     </section>
   );
 };
+
+export default AuthContainer;

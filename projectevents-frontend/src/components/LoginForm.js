@@ -1,11 +1,32 @@
 import * as React from "react";
+import { apiBaseUrl } from "../apiConfig";
+import { useNavigate } from "react-router-dom";
 
 export const LoginForm = ({ onViewChange }) => {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      const response = await fetch(`${apiBaseUrl}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username: email, password }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem("jwt", data.jwt);
+        navigate("/home");
+      } else {
+        console.error("Login failed");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   return (
