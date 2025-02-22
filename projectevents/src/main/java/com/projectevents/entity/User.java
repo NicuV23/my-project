@@ -25,6 +25,11 @@ public class User {
     @Column(length = 50)
     private String email;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role")
+    private Set<String> roles;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<Participant> participants = new HashSet<>();
 
@@ -60,6 +65,14 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Set<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<String> roles) {
+        this.roles = roles;
     }
 
     public Set<Participant> getParticipants() {

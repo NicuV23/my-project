@@ -7,7 +7,9 @@ import com.projectevents.dto.UserDTO;
 import com.projectevents.entity.User;
 import com.projectevents.repository.UserRepository;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,12 +19,21 @@ public class UserService {
     private UserRepository userRepository;
     
     public UserDTO createUser(UserDTO userDTO) {
+        if (userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
+            throw new IllegalArgumentException("Username already exists");
+        }
+
         User user = new User();
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
         
         String hashedPassword = BCrypt.hashpw(userDTO.getPassword(), BCrypt.gensalt());
         user.setPassword(hashedPassword);
+
+        Set<String> roles = new HashSet<>();
+        roles.add("ROLE_PARTICIPANT"); 
+        user.setRoles(roles);
+
         userRepository.save(user);
         return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getPassword());
     }

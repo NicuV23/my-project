@@ -34,9 +34,13 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> registerUser(@RequestBody UserDTO userDTO) {
-        UserDTO createdUser = userService.createUser(userDTO);
-        return ResponseEntity.ok(createdUser);
+    public ResponseEntity<?> registerUser(@RequestBody UserDTO userDTO) {
+        try {
+            UserDTO createdUser = userService.createUser(userDTO);
+            return ResponseEntity.ok(createdUser);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     static class AuthRequest {
