@@ -10,7 +10,6 @@ const EventCard = ({ event, onToggleJoin }) => {
     participants,
     maxParticipants,
     category,
-    image,
     description,
     isJoined,
   } = event;
@@ -20,7 +19,6 @@ const EventCard = ({ event, onToggleJoin }) => {
       className="bg-[#111] rounded-lg overflow-hidden shadow-lg"
       role="article"
     >
-      <img src={image} alt={title} className="w-full h-48 object-cover" />
       <div className="p-6">
         <div className="flex justify-between items-start mb-4">
           <h2 className="text-xl font-semibold text-white">{title}</h2>
