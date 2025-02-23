@@ -1,6 +1,7 @@
 package com.projectevents.entity;
 
-
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,6 +25,15 @@ public class MainEvent {
 
     @Column
     private Integer maxParticipants;
+
+    @Column(name = "event_date")
+    private LocalDate eventDate; 
+
+    @Column(name = "event_time")
+    private LocalTime eventTime; 
+
+    @Column(columnDefinition = "TEXT")
+    private String description; 
 
     @ManyToOne
     @JoinColumn(name = "game_type_id")
@@ -73,7 +83,7 @@ public class MainEvent {
     public void setGameType(GameType gameType) {
         this.gameType = gameType;
     }
-    
+
     public Long getChatId() {
         return chatId;
     }
@@ -94,4 +104,27 @@ public class MainEvent {
         return gameType != null ? gameType.getTypeId() : null;  
     }
 
+    public LocalDate getEventDate() {
+        return eventDate;
+    }
+
+    public void setEventDate(LocalDate eventDate) {
+        this.eventDate = eventDate;
+    }
+
+    public LocalTime getEventTime() {
+        return eventTime;
+    }
+
+    public void setEventTime(LocalTime eventTime) {
+        this.eventTime = eventTime;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }

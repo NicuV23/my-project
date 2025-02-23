@@ -1,5 +1,6 @@
 package com.projectevents.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,15 +22,21 @@ public class MessageService {
     private UserService userService;
     @Autowired
     private ChatService chatService;
+    
+    
 
     public MessageDTO createMessage(MessageDTO messageDTO) {
         Message message = new Message();
         message.setContent(messageDTO.getContent());
-        message.setTimestamp(messageDTO.getTimestamp());
+        message.setTimestamp(new Date());  
         
         User sender = userService.findUserById(messageDTO.getSenderId());
         Chat chat = chatService.findChatById(messageDTO.getChatId());
         
+        if (chat == null) {
+            throw new RuntimeException("Chat not found with id: " + messageDTO.getChatId());
+        }
+
         message.setSender(sender);
         message.setChat(chat);
 
@@ -46,6 +53,31 @@ public class MessageService {
     public List<MessageDTO> getAllMessages() {
         return messageRepository.findAll().stream()
             .map(m -> new MessageDTO(m.getMessageId(), m.getContent(), m.getTimestamp(), m.getSender().getId(), m.getChat() != null ? m.getChat().getChatId() : null))
+            .collect(Collectors.toList());
+    }
+    
+    public boolean deleteMessagesByChatId(Long chatId) {
+        try {
+            long count = messageRepository.countByChatChatId(chatId);
+            if (count > 0) {
+                messageRepository.deleteByChatChatId(chatId);
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
+    public List<MessageDTO> getMessagesByChatId(Long chatId) {
+        return messageRepository.findByChatChatId(chatId).stream()
+            .map(message -> new MessageDTO(
+                message.getMessageId(), 
+                message.getContent(), 
+                message.getTimestamp(),
+                message.getSender().getId(), 
+                message.getChat().getChatId()
+            ))
             .collect(Collectors.toList());
     }
 

@@ -34,7 +34,8 @@ public class MainEventController {
     public ResponseEntity<List<MainEventDTO>> getAllMainEvents() {
         List<MainEventDTO> events = mainEventService.findAllEvents()
             .stream()
-            .map(event -> new MainEventDTO(event.getEventId(), event.getName(), event.getLocation(), event.getMaxParticipants(),event.getChatId(),event.getGameTypeId()))
+            .map(event -> new MainEventDTO(event.getEventId(), event.getName(), event.getLocation(), event.getMaxParticipants(),
+                    event.getChatId(), event.getGameTypeId(), event.getEventDate(), event.getEventTime(), event.getDescription()))
             .collect(Collectors.toList());
         return ResponseEntity.ok(events);
     }

@@ -1,79 +1,50 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navigation from "./Navigation";
 import EventList from "./EventList";
 import CreateEvent from "./CreateEvent";
-import { useEffect } from "react";
+
+const apiBaseUrl = "http://localhost:8080/api";
 
 const EventHub = () => {
   const [currentView, setCurrentView] = useState("events");
-  const [events, setEvents] = useState([
-    {
-      id: 1,
-      title: "Summer Music Festival",
-      date: "2024-07-15",
-      time: "18:00",
-      location: "Central Park, New York",
-      participants: 128,
-      maxParticipants: 200,
-      category: "Music",
-      image: "https://placehold.co/800x400",
-      description:
-        "A vibrant music festival featuring top artists and local talents.",
-      isJoined: false,
-    },
-    {
-      id: 2,
-      title: "Tech Conference 2024",
-      date: "2024-08-20",
-      time: "09:00",
-      location: "Convention Center, San Francisco",
-      participants: 256,
-      maxParticipants: 300,
-      category: "Technology",
-      image: "https://placehold.co/800x400",
-      description: "Explore the latest in technology and innovation.",
-      isJoined: true,
-    },
-    {
-      id: 3,
-      title: "Food & Wine Expo",
-      date: "2024-09-10",
-      time: "14:00",
-      location: "Grand Hotel, Chicago",
-      participants: 75,
-      maxParticipants: 100,
-      category: "Food",
-      image: "https://placehold.co/800x400",
-      description: "Experience culinary excellence and wine tasting.",
-      isJoined: false,
-    },
-  ]);
-
-  const handleToggleJoin = (eventId) => {
-    setEvents(
-      events.map((event) =>
-        event.id === eventId
-          ? {
-              ...event,
-              isJoined: !event.isJoined,
-              participants: event.isJoined
-                ? event.participants - 1
-                : event.participants + 1,
-            }
-          : event
-      )
-    );
-  };
-
-  const [, setIsAuthenticated] = useState(false);
+  const [events, setEvents] = useState([]);
+  const [gameTypes, setGameTypes] = useState({});
 
   useEffect(() => {
-    const token = localStorage.getItem("jwt");
-    if (token) {
-      setIsAuthenticated(true);
-    } else {
-      setIsAuthenticated(false);
-    }
+    const fetchGameTypes = async () => {
+      try {
+        const response = await fetch(`${apiBaseUrl}/game-types`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("jwt")}` },
+        });
+        if (!response.ok) throw new Error("Failed to fetch game types");
+
+        const data = await response.json();
+        const gameTypeMap = data.reduce((acc, type) => {
+          acc[type.id] = type.name;
+          return acc;
+        }, {});
+        setGameTypes(gameTypeMap);
+      } catch (error) {
+        console.error("Error fetching game types:", error);
+      }
+    };
+
+    const fetchEvents = async () => {
+      try {
+        const response = await fetch(`${apiBaseUrl}/main-events`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("jwt")}` },
+        });
+        if (!response.ok) throw new Error("Failed to fetch events");
+
+        const data = await response.json();
+        setEvents(data);
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      }
+    };
+
+    fetchGameTypes();
+    fetchEvents();
   }, []);
 
   return (
@@ -87,7 +58,7 @@ const EventHub = () => {
                 ? events.filter((event) => event.isJoined)
                 : events
             }
-            onToggleJoin={handleToggleJoin}
+            gameTypes={gameTypes}
           />
         )}
         {currentView === "create" && <CreateEvent />}

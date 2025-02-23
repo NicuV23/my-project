@@ -11,7 +11,7 @@ import com.projectevents.service.ChatService;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/api/chat")
+@RequestMapping("/api/chats")
 public class ChatController {
 
     @Autowired

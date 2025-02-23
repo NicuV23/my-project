@@ -1,13 +1,8 @@
 package com.projectevents.entity;
 
-
-import java.util.HashSet;
-import java.util.Set;
-
 import jakarta.persistence.*;
-
-
-
+import java.util.Set;
+import java.util.HashSet;
 
 @Entity
 @Table(name = "user")
@@ -25,13 +20,13 @@ public class User {
     @Column(length = 50)
     private String email;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "role")
-    private Set<String> roles;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<Participant> participants = new HashSet<>();
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "user_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet<>();
 
     public User() {}
 
@@ -67,19 +62,11 @@ public class User {
         this.email = email;
     }
 
-    public Set<String> getRoles() {
+    public Set<Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(Set<String> roles) {
+    public void setRoles(Set<Role> roles) {
         this.roles = roles;
-    }
-
-    public Set<Participant> getParticipants() {
-        return participants;
-    }
-
-    public void setParticipants(Set<Participant> participants) {
-        this.participants = participants;
     }
 }

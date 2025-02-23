@@ -4,7 +4,9 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.projectevents.dto.UserDTO;
+import com.projectevents.entity.Role;
 import com.projectevents.entity.User;
+import com.projectevents.repository.RoleRepository;
 import com.projectevents.repository.UserRepository;
 
 import java.util.HashSet;
@@ -13,14 +15,17 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class UserService {
+public class UserService {  
 
     @Autowired
     private UserRepository userRepository;
     
+    @Autowired
+    private RoleRepository roleRepository;
+    
     public UserDTO createUser(UserDTO userDTO) {
         if (userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("Username already exists");
+            throw new UsernameAlreadyExistsException("Username already exists");
         }
 
         User user = new User();
@@ -30,12 +35,22 @@ public class UserService {
         String hashedPassword = BCrypt.hashpw(userDTO.getPassword(), BCrypt.gensalt());
         user.setPassword(hashedPassword);
 
-        Set<String> roles = new HashSet<>();
-        roles.add("ROLE_PARTICIPANT"); 
-        user.setRoles(roles);
+//        Set<Role> roles = new HashSet<>();
+//        for (String roleName : userDTO.getRoles()) {  
+//            Role role = roleRepository.findByName(roleName)
+//                .orElseThrow(() -> new IllegalArgumentException("Role not found: " + roleName));
+//            roles.add(role);
+//        }
+//        user.setRoles(roles);
 
         userRepository.save(user);
         return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getPassword());
+    }
+    
+    public class UsernameAlreadyExistsException extends RuntimeException {
+        public UsernameAlreadyExistsException(String message) {
+            super(message);
+        }
     }
     
     public User findUserById(Long id) {

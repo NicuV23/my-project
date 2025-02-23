@@ -23,32 +23,54 @@ public class MainEventService {
     private GameTypeRepository gameTypeRepository;
 
     @Autowired
-    private ChatRepository chatRepository; 
+    private ChatRepository chatRepository;
 
     public MainEventDTO createMainEvent(MainEventDTO mainEventDTO) {
         MainEvent mainEvent = new MainEvent();
         mainEvent.setName(mainEventDTO.getName());
         mainEvent.setLocation(mainEventDTO.getLocation());
         mainEvent.setMaxParticipants(mainEventDTO.getMaxParticipants());
-        
+        mainEvent.setEventDate(mainEventDTO.getEventDate());
+        mainEvent.setEventTime(mainEventDTO.getEventTime());
+        mainEvent.setDescription(mainEventDTO.getDescription());
+
         GameType gameType = gameTypeRepository.findById(mainEventDTO.getGameTypeId())
             .orElseThrow(() -> new IllegalArgumentException("Invalid gameTypeId: " + mainEventDTO.getGameTypeId()));
         mainEvent.setGameType(gameType);
 
         if (mainEventDTO.getChatId() != null) {
-            
-            
-        }Chat chat = chatRepository.findById(mainEventDTO.getChatId())
+            Chat chat = chatRepository.findById(mainEventDTO.getChatId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid chatId: " + mainEventDTO.getChatId()));
             mainEvent.setChatId(chat.getChatId());
+        }
 
         mainEvent = mainEventRepository.save(mainEvent);
-        return new MainEventDTO(mainEvent.getEventId(), mainEvent.getName(), mainEvent.getLocation(), mainEvent.getMaxParticipants(), mainEvent.getGameTypeId(), mainEvent.getChatId());
+        return new MainEventDTO(
+            mainEvent.getEventId(),
+            mainEvent.getName(),
+            mainEvent.getLocation(),
+            mainEvent.getMaxParticipants(),
+            mainEvent.getChatId(),
+            mainEvent.getGameTypeId(),
+            mainEvent.getEventDate(),
+            mainEvent.getEventTime(),
+            mainEvent.getDescription()
+        );
     }
 
     public MainEventDTO getMainEventById(Long id) {
         return mainEventRepository.findById(id)
-            .map(event -> new MainEventDTO(event.getEventId(), event.getName(), event.getLocation(), event.getMaxParticipants(), event.getChatId(), event.getGameTypeId()))
+            .map(event -> new MainEventDTO(
+                event.getEventId(),
+                event.getName(),
+                event.getLocation(),
+                event.getMaxParticipants(),
+                event.getChatId(),
+                event.getGameTypeId(),
+                event.getEventDate(),
+                event.getEventTime(),
+                event.getDescription()
+            ))
             .orElse(null);
     }
 
@@ -61,6 +83,9 @@ public class MainEventService {
             event.setName(mainEventDTO.getName());
             event.setLocation(mainEventDTO.getLocation());
             event.setMaxParticipants(mainEventDTO.getMaxParticipants());
+            event.setEventDate(mainEventDTO.getEventDate());
+            event.setEventTime(mainEventDTO.getEventTime());
+            event.setDescription(mainEventDTO.getDescription());
 
             GameType gameType = gameTypeRepository.findById(mainEventDTO.getGameTypeId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid gameTypeId: " + mainEventDTO.getGameTypeId()));
@@ -73,7 +98,17 @@ public class MainEventService {
             }
 
             mainEventRepository.save(event);
-            return new MainEventDTO(event.getEventId(), event.getName(), event.getLocation(), event.getMaxParticipants(), event.getGameTypeId(), event.getChatId());
+            return new MainEventDTO(
+                event.getEventId(),
+                event.getName(),
+                event.getLocation(),
+                event.getMaxParticipants(),
+                event.getChatId(),
+                event.getGameTypeId(),
+                event.getEventDate(),
+                event.getEventTime(),
+                event.getDescription()
+            );
         }).orElse(null);
     }
 

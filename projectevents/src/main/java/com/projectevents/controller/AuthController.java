@@ -5,9 +5,13 @@ import com.projectevents.entity.User;
 import com.projectevents.security.JwtUtil;
 import com.projectevents.service.LoginService;
 import com.projectevents.service.UserService;
+import com.projectevents.service.UserService.UsernameAlreadyExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -38,6 +42,10 @@ public class AuthController {
         try {
             UserDTO createdUser = userService.createUser(userDTO);
             return ResponseEntity.ok(createdUser);
+        } catch (UsernameAlreadyExistsException e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

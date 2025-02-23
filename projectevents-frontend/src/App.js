@@ -6,6 +6,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import EventHub from "./components/eventhub/EventHub";
+import { EventDetails } from "./components/eventhub/EventsDetailList";
 import { AuthLayout } from "./layouts/AuthLayout";
 
 const PrivateRoute = ({ element }) => {
@@ -18,6 +19,10 @@ const App = () => {
       <Routes>
         <Route path="/auth" element={<AuthLayout />} />
         <Route path="/home" element={<PrivateRoute element={<EventHub />} />} />
+        <Route
+          path="/events/:id"
+          element={<PrivateRoute element={<EventDetails />} />}
+        />
         <Route path="*" element={<Navigate to="/auth" />} />
       </Routes>
     </Router>
