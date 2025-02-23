@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Navigation from "./Navigation";
-import EventList from "./EventList";
+import MyEventList from "./MyEventList";
 
 const apiBaseUrl = "http://localhost:8080/api";
 
@@ -12,11 +12,8 @@ const MyEvents = () => {
   useEffect(() => {
     const userIdFromStorage = localStorage.getItem("userId");
     if (userIdFromStorage) {
-      const parsedUserId = parseInt(userIdFromStorage, 10);
-      setCurrentUserId(parsedUserId);
-      console.log("User ID from localStorage:", parsedUserId);
-    } else {
-      console.log("No userId found in localStorage!");
+      setCurrentUserId(parseInt(userIdFromStorage, 10));
+      console.log("User ID from localStorage:", userIdFromStorage);
     }
   }, []);
 
@@ -46,7 +43,6 @@ const MyEvents = () => {
     if (currentUserId !== null) {
       const fetchMyEvents = async () => {
         try {
-          console.log("Fetching my events for user:", currentUserId);
           const response = await fetch(
             `${apiBaseUrl}/main-events/user/${currentUserId}`,
             {
@@ -74,7 +70,7 @@ const MyEvents = () => {
       <Navigation />
       <main className="container mx-auto px-4 pt-20">
         <h2 className="text-white text-2xl mb-4">My Events</h2>
-        <EventList events={events} gameTypes={gameTypes} />
+        <MyEventList events={events} gameTypes={gameTypes} />
       </main>
     </div>
   );
