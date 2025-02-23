@@ -5,7 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 export const RegisterForm = ({ onViewChange }) => {
   const [formData, setFormData] = React.useState({
-    name: "",
+    username: "",
     email: "",
     password: "",
   });
@@ -14,31 +14,25 @@ export const RegisterForm = ({ onViewChange }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const userData = {
-      username: formData.name,
-      email: formData.email,
-      password: formData.password,
-    };
 
     try {
       const response = await fetch(`${apiBaseUrl}/register`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
       });
+
       const data = await response.json();
       if (!response.ok) {
-        toast.error(data.error);
-        throw new Error(data.error);
+        toast.error(data.error || "Registration failed!");
+        throw new Error(data.error || "Registration failed!");
       }
 
       toast.success("Account created successfully!");
-      console.log("Success:", data);
+      console.log("✅ Registration successful:", data);
+      setTimeout(() => onViewChange("login"), 1500);
     } catch (error) {
-      toast.error(error);
-      console.error("Error:", error.error);
+      console.error("❌ Registration error:", error);
     } finally {
       setLoading(false);
     }
@@ -61,35 +55,27 @@ export const RegisterForm = ({ onViewChange }) => {
 
         <div className="space-y-4">
           <div>
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-gray-200 mb-2"
-            >
-              Full Name
+            <label className="block text-sm font-medium text-gray-200 mb-2">
+              Username
             </label>
             <input
-              id="name"
-              name="name"
               type="text"
-              value={formData.name}
+              name="username"
+              value={formData.username}
               onChange={handleChange}
               className="w-full px-4 py-3 bg-[#2a2a2a] rounded-lg border border-gray-700 text-white focus:outline-none focus:border-red-500"
-              placeholder="Enter your full name"
+              placeholder="Choose a username"
               required
             />
           </div>
 
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-200 mb-2"
-            >
+            <label className="block text-sm font-medium text-gray-200 mb-2">
               Email
             </label>
             <input
-              id="email"
-              name="email"
               type="email"
+              name="email"
               value={formData.email}
               onChange={handleChange}
               className="w-full px-4 py-3 bg-[#2a2a2a] rounded-lg border border-gray-700 text-white focus:outline-none focus:border-red-500"
@@ -99,16 +85,12 @@ export const RegisterForm = ({ onViewChange }) => {
           </div>
 
           <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-200 mb-2"
-            >
+            <label className="block text-sm font-medium text-gray-200 mb-2">
               Password
             </label>
             <input
-              id="password"
-              name="password"
               type="password"
+              name="password"
               value={formData.password}
               onChange={handleChange}
               className="w-full px-4 py-3 bg-[#2a2a2a] rounded-lg border border-gray-700 text-white focus:outline-none focus:border-red-500"

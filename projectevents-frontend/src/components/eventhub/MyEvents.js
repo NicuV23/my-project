@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import Navigation from "./Navigation";
 import EventList from "./EventList";
-import CreateEvent from "./CreateEvent";
 
 const apiBaseUrl = "http://localhost:8080/api";
 
-const EventHub = () => {
-  const [currentView, setCurrentView] = useState("events");
+const MyEvents = () => {
   const [events, setEvents] = useState([]);
   const [gameTypes, setGameTypes] = useState({});
   const [currentUserId, setCurrentUserId] = useState(null);
@@ -14,8 +12,11 @@ const EventHub = () => {
   useEffect(() => {
     const userIdFromStorage = localStorage.getItem("userId");
     if (userIdFromStorage) {
-      setCurrentUserId(parseInt(userIdFromStorage, 10));
-      console.log("User ID from localStorage:", userIdFromStorage);
+      const parsedUserId = parseInt(userIdFromStorage, 10);
+      setCurrentUserId(parsedUserId);
+      console.log("User ID from localStorage:", parsedUserId);
+    } else {
+      console.log("No userId found in localStorage!");
     }
   }, []);
 
@@ -42,28 +43,7 @@ const EventHub = () => {
   }, []);
 
   useEffect(() => {
-    if (currentView === "events") {
-      const fetchEvents = async () => {
-        try {
-          const response = await fetch(`${apiBaseUrl}/main-events`, {
-            headers: { Authorization: `Bearer ${localStorage.getItem("jwt")}` },
-          });
-          if (!response.ok) throw new Error("Failed to fetch events");
-
-          const data = await response.json();
-          setEvents(data);
-          console.log("All events fetched:", data);
-        } catch (error) {
-          console.error("Error fetching events:", error);
-        }
-      };
-
-      fetchEvents();
-    }
-  }, [currentView]);
-
-  useEffect(() => {
-    if (currentView === "myevents" && currentUserId) {
+    if (currentUserId !== null) {
       const fetchMyEvents = async () => {
         try {
           console.log("Fetching my events for user:", currentUserId);
@@ -87,28 +67,17 @@ const EventHub = () => {
 
       fetchMyEvents();
     }
-  }, [currentView, currentUserId]);
+  }, [currentUserId]);
 
   return (
     <div className="bg-[#0a0a0a] min-h-screen w-full font-[Inter]">
-      <Navigation currentView={currentView} setCurrentView={setCurrentView} />
+      <Navigation />
       <main className="container mx-auto px-4 pt-20">
-        {currentView === "events" && (
-          <>
-            <h2 className="text-white text-2xl mb-4">All Events</h2>
-            <EventList events={events} gameTypes={gameTypes} />
-          </>
-        )}
-        {currentView === "myevents" && (
-          <>
-            <h2 className="text-white text-2xl mb-4">My Events</h2>
-            <EventList events={events} gameTypes={gameTypes} />
-          </>
-        )}
-        {currentView === "create" && <CreateEvent />}
+        <h2 className="text-white text-2xl mb-4">My Events</h2>
+        <EventList events={events} gameTypes={gameTypes} />
       </main>
     </div>
   );
 };
 
-export default EventHub;
+export default MyEvents;

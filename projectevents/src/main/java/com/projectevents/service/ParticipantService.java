@@ -1,6 +1,7 @@
 package com.projectevents.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,36 +11,61 @@ import com.projectevents.dto.ParticipantDTO;
 import com.projectevents.entity.MainEvent;
 import com.projectevents.entity.Participant;
 import com.projectevents.entity.User;
+import com.projectevents.repository.MainEventRepository;
 import com.projectevents.repository.ParticipantRepository;
+import com.projectevents.repository.UserRepository;
 
 @Service
 public class ParticipantService {
 
     @Autowired
     private ParticipantRepository participantRepository;
+    
     @Autowired
-    private UserService userService; 
+    private UserRepository userRepository;
+    
     @Autowired
-    private MainEventService mainEventService; 
+    private MainEventRepository mainEventRepository;
 
-    public ParticipantDTO addParticipant(ParticipantDTO participantDTO) {
-        Participant participant = new Participant();
-        participant.setStatus(participantDTO.getStatus());
+   
+    public boolean toggleParticipant(Long userId, Long eventId) {
+    	Optional<Participant> existingParticipant = participantRepository.findByUser_IdAndEvent_EventId(userId, eventId);
+
         
-        User user = userService.findUserById(participantDTO.getUserId());
-        participant.setUser(user);
+        if (existingParticipant.isPresent()) {
+           
+            participantRepository.delete(existingParticipant.get());
+            updateParticipantCount(eventId, -1);
+            return false;
+        } else {
+            
+            User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+            MainEvent event = mainEventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found"));
+            
+            if (event.getCurrentParticipants() >= event.getMaxParticipants()) {
+                throw new RuntimeException("Event is full");
+            }
 
-        MainEvent event = mainEventService.findMainEventById(participantDTO.getEventId());
-        participant.setEvent(event);
+            Participant newParticipant = new Participant();
+            newParticipant.setUser(user);
+            newParticipant.setEvent(event);
+            newParticipant.setStatus("active");
 
-        participant = participantRepository.save(participant);
-        return new ParticipantDTO(participant.getParticipantId(), participant.getUser().getId(), participant.getEvent().getEventId(), participant.getStatus());
+            participantRepository.save(newParticipant);
+            updateParticipantCount(eventId, 1);
+            return true; 
+        }
     }
 
-    public ParticipantDTO getParticipantById(Long id) {
-        return participantRepository.findById(id)
-            .map(p -> new ParticipantDTO(p.getParticipantId(), p.getUser().getId(), p.getEvent().getEventId(), p.getStatus()))
-            .orElse(null);
+    private void updateParticipantCount(Long eventId, int change) {
+        MainEvent event = mainEventRepository.findById(eventId)
+            .orElseThrow(() -> new RuntimeException("Event not found"));
+        event.setCurrentParticipants(
+        	    (event.getCurrentParticipants() != null ? event.getCurrentParticipants() : 0) + change
+        	);
+
     }
 
     public List<ParticipantDTO> getAllParticipants() {
@@ -47,20 +73,4 @@ public class ParticipantService {
             .map(p -> new ParticipantDTO(p.getParticipantId(), p.getUser().getId(), p.getEvent().getEventId(), p.getStatus()))
             .collect(Collectors.toList());
     }
-
-    public ParticipantDTO updateParticipant(Long id, ParticipantDTO participantDTO) {
-        return participantRepository.findById(id).map(participant -> {
-            participant.setStatus(participantDTO.getStatus());
-            participantRepository.save(participant);
-            return new ParticipantDTO(participant.getParticipantId(), participant.getUser().getId(), participant.getEvent().getEventId(), participant.getStatus());
-        }).orElse(null);
-    }
-
-    public boolean deleteParticipant(Long id) {
-        return participantRepository.findById(id).map(participant -> {
-            participantRepository.delete(participant);
-            return true;
-        }).orElse(false);
-    }
 }
-

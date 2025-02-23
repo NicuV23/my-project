@@ -34,6 +34,14 @@ public class MainEvent {
 
     @Column(columnDefinition = "TEXT")
     private String description; 
+    
+    @Column(name = "creator_id")
+    private Long creatorId;
+
+    
+    @Column(nullable = false)
+    private Integer currentParticipants = 0;
+
 
     @ManyToOne
     @JoinColumn(name = "game_type_id")
@@ -43,6 +51,14 @@ public class MainEvent {
     private Set<Participant> participants = new HashSet<>();
 
     public MainEvent() {}
+    
+    public Integer getCurrentParticipants() {
+        return currentParticipants;
+    }
+
+    public void setCurrentParticipants(Integer currentParticipants) {
+        this.currentParticipants = currentParticipants;
+    }
 
     public Long getEventId() {
         return eventId;
@@ -126,5 +142,13 @@ public class MainEvent {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+    
+    public Long getCreatorId() {
+        return creatorId;
+    }
+
+    public void setCreatorId(Long creatorId) {
+        this.creatorId = creatorId;
     }
 }

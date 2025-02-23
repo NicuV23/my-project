@@ -6,10 +6,18 @@ import com.projectevents.entity.MainEvent;
 public class MainEventConverter {
 
     public static MainEventDTO entityToDTO(MainEvent mainEvent) {
-    	return new MainEventDTO(mainEvent.getEventId(), mainEvent.getName(), mainEvent.getLocation(), 
-                mainEvent.getMaxParticipants(), mainEvent.getGameTypeId(), mainEvent.getChatId(),
-                mainEvent.getEventDate(), mainEvent.getEventTime(), mainEvent.getDescription());
-
+        return new MainEventDTO(
+            mainEvent.getEventId(), 
+            mainEvent.getName(), 
+            mainEvent.getLocation(), 
+            mainEvent.getMaxParticipants(), 
+            mainEvent.getGameTypeId(), 
+            mainEvent.getChatId(),
+            mainEvent.getEventDate(), 
+            mainEvent.getEventTime(),
+            mainEvent.getDescription(),  
+            mainEvent.getCreatorId()     
+        );
     }
 
     public static MainEvent dtoToEntity(MainEventDTO mainEventDTO) {
@@ -22,6 +30,7 @@ public class MainEventConverter {
         mainEvent.setEventTime(mainEventDTO.getEventTime());  
         mainEvent.setDescription(mainEventDTO.getDescription()); 
         mainEvent.setChatId(mainEventDTO.getChatId());
+        mainEvent.setCreatorId(mainEventDTO.getCreatorId());   
         return mainEvent;
     }
 }

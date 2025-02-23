@@ -12,6 +12,7 @@ import com.projectevents.repository.GameTypeRepository;
 import com.projectevents.repository.ChatRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class MainEventService {
@@ -33,6 +34,7 @@ public class MainEventService {
         mainEvent.setEventDate(mainEventDTO.getEventDate());
         mainEvent.setEventTime(mainEventDTO.getEventTime());
         mainEvent.setDescription(mainEventDTO.getDescription());
+        mainEvent.setCreatorId(mainEventDTO.getCreatorId()); 
 
         GameType gameType = gameTypeRepository.findById(mainEventDTO.getGameTypeId())
             .orElseThrow(() -> new IllegalArgumentException("Invalid gameTypeId: " + mainEventDTO.getGameTypeId()));
@@ -45,18 +47,34 @@ public class MainEventService {
         }
 
         mainEvent = mainEventRepository.save(mainEvent);
+
         return new MainEventDTO(
             mainEvent.getEventId(),
             mainEvent.getName(),
             mainEvent.getLocation(),
             mainEvent.getMaxParticipants(),
-            mainEvent.getChatId(),
             mainEvent.getGameTypeId(),
+            mainEvent.getChatId(),
             mainEvent.getEventDate(),
             mainEvent.getEventTime(),
-            mainEvent.getDescription()
+            mainEvent.getDescription(),
+            mainEvent.getCreatorId() 
         );
     }
+
+    
+    public List<MainEventDTO> getEventsByUser(Long userId) {
+        List<MainEvent> events = mainEventRepository.findByCreatorId(userId);
+        return events.stream()
+            .map(event -> new MainEventDTO(
+                event.getEventId(), event.getName(), event.getLocation(),
+                event.getMaxParticipants(), event.getGameTypeId(), event.getChatId(),
+                event.getEventDate(), event.getEventTime(), event.getDescription(),
+                event.getCreatorId()  
+            ))
+            .collect(Collectors.toList());
+    }
+
 
     public MainEventDTO getMainEventById(Long id) {
         return mainEventRepository.findById(id)
@@ -69,7 +87,8 @@ public class MainEventService {
                 event.getGameTypeId(),
                 event.getEventDate(),
                 event.getEventTime(),
-                event.getDescription()
+                event.getDescription(),
+                event.getCreatorId()
             ))
             .orElse(null);
     }
@@ -107,7 +126,8 @@ public class MainEventService {
                 event.getGameTypeId(),
                 event.getEventDate(),
                 event.getEventTime(),
-                event.getDescription()
+                event.getDescription(),
+                event.getCreatorId()
             );
         }).orElse(null);
     }

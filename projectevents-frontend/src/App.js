@@ -6,6 +6,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import EventHub from "./components/eventhub/EventHub";
+import MyEvents from "./components/eventhub/MyEvents";
 import { EventDetails } from "./components/eventhub/EventsDetailList";
 import { AuthLayout } from "./layouts/AuthLayout";
 
@@ -19,6 +20,10 @@ const App = () => {
       <Routes>
         <Route path="/auth" element={<AuthLayout />} />
         <Route path="/home" element={<PrivateRoute element={<EventHub />} />} />
+        <Route
+          path="/my-events"
+          element={<PrivateRoute element={<MyEvents />} />}
+        />
         <Route
           path="/events/:id"
           element={<PrivateRoute element={<EventDetails />} />}

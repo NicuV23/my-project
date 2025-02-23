@@ -5,7 +5,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import java.util.Date;
 
 @Component
@@ -17,24 +16,30 @@ public class JwtUtil {
     @Value("${jwt.expiration}")
     private long expirationTime;
 
-    public String generateToken(String username) {
+    public String generateToken(String username, Long userId) {
         return Jwts.builder()
                 .setSubject(username)
+                .claim("userId", userId) 
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .signWith(SignatureAlgorithm.HS512, secretKey)
+                .signWith(SignatureAlgorithm.HS512, secretKey.getBytes()) 
                 .compact();
     }
 
     public Claims extractClaims(String token) {
         return Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token)
-                .getBody();
+        	    .setSigningKey(secretKey.getBytes())
+        	    .parseClaimsJws(token)
+        	    .getBody();
+
     }
 
     public String extractUsername(String token) {
         return extractClaims(token).getSubject();
+    }
+
+    public Long extractUserId(String token) {  
+        return extractClaims(token).get("userId", Long.class);
     }
 
     public boolean isTokenExpired(String token) {

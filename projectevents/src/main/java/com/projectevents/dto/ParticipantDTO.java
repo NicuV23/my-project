@@ -35,7 +35,7 @@ public class ParticipantDTO {
         return eventId;
     }
 
-     void setEventId(Long eventId) {
+    public void setEventId(Long eventId) {
         this.eventId = eventId;
     }
 

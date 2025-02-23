@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-const Navigation = ({ currentView, setCurrentView }) => {
+const Navigation = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -21,35 +21,20 @@ const Navigation = ({ currentView, setCurrentView }) => {
           </div>
           <div className="flex space-x-4" role="tablist">
             <button
-              onClick={() => setCurrentView("events")}
-              className={`px-4 py-2 text-white ${
-                currentView === "events" ? "bg-red-600 rounded-lg" : ""
-              }`}
-              role="tab"
-              aria-selected={currentView === "events"}
-              aria-controls="events-panel"
+              onClick={() => navigate("/home")}
+              className="px-4 py-2 text-white"
             >
               All Events
             </button>
             <button
-              onClick={() => setCurrentView("myevents")}
-              className={`px-4 py-2 text-white ${
-                currentView === "myevents" ? "bg-red-600 rounded-lg" : ""
-              }`}
-              role="tab"
-              aria-selected={currentView === "myevents"}
-              aria-controls="myevents-panel"
+              onClick={() => navigate("/my-events")}
+              className="px-4 py-2 text-white"
             >
               My Events
             </button>
             <button
-              onClick={() => setCurrentView("create")}
-              className={`px-4 py-2 text-white ${
-                currentView === "create" ? "bg-red-600 rounded-lg" : ""
-              }`}
-              role="tab"
-              aria-selected={currentView === "create"}
-              aria-controls="create-panel"
+              onClick={() => navigate("/home?view=create")}
+              className="px-4 py-2 text-white"
             >
               Create Event
             </button>

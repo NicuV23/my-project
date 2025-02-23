@@ -1,5 +1,5 @@
 export const ChatSection = ({
-  chat = [], // Default to an empty array if chat is undefined
+  chat = [],
   newMessage,
   setNewMessage,
   onSendMessage,

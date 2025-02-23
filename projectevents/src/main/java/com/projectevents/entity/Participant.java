@@ -2,8 +2,6 @@ package com.projectevents.entity;
 
 import jakarta.persistence.*;
 
-
-
 @Entity
 @Table(name = "participant")
 public class Participant {
@@ -31,7 +29,7 @@ public class Participant {
     public void setParticipantId(Long participantId) {
         this.participantId = participantId;
     }
-    
+
     public Long getUserId() {
         return user != null ? user.getId() : null;
     }
@@ -60,7 +58,7 @@ public class Participant {
         return event;
     }
 
-  public  void setEvent(MainEvent event) {
+    public void setEvent(MainEvent event) {
         this.event = event;
     }
 }

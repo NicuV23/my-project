@@ -13,9 +13,13 @@ public class MainEventDTO {
     private String description;
     private Long gameTypeId;
     private Long chatId;
+    private Long creatorId;
+
+    public MainEventDTO() {}
 
     public MainEventDTO(Long eventId, String name, String location, Integer maxParticipants, 
-                        Long gameTypeId, Long chatId, LocalDate eventDate, LocalTime eventTime, String description) {
+                        Long gameTypeId, Long chatId, LocalDate eventDate, LocalTime eventTime, 
+                        String description, Long creatorId) {
         this.eventId = eventId;
         this.name = name;
         this.location = location;
@@ -25,10 +29,12 @@ public class MainEventDTO {
         this.eventDate = eventDate;
         this.eventTime = eventTime;
         this.description = description;
+        this.creatorId = creatorId;
     }
 
     public MainEventDTO(String name, String location, Integer maxParticipants, 
-                        Long gameTypeId, Long chatId, LocalDate eventDate, LocalTime eventTime, String description) {
+                        Long gameTypeId, Long chatId, LocalDate eventDate, LocalTime eventTime, 
+                        String description, Long creatorId) {
         this.name = name;
         this.location = location;
         this.maxParticipants = maxParticipants;
@@ -37,9 +43,9 @@ public class MainEventDTO {
         this.eventDate = eventDate;
         this.eventTime = eventTime;
         this.description = description;
+        this.creatorId = creatorId;
     }
 
-    // Getters și Setters
     public Long getEventId() { return eventId; }
     public void setEventId(Long eventId) { this.eventId = eventId; }
 
@@ -66,4 +72,7 @@ public class MainEventDTO {
 
     public Long getChatId() { return chatId; }
     public void setChatId(Long chatId) { this.chatId = chatId; }
+
+    public Long getCreatorId() { return creatorId; }
+    public void setCreatorId(Long creatorId) { this.creatorId = creatorId; }
 }

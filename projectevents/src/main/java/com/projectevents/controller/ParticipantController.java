@@ -17,33 +17,31 @@ public class ParticipantController {
     @Autowired
     private ParticipantService participantService;
 
+    
     @PostMapping
-    public ResponseEntity<ParticipantDTO> addParticipant(@RequestBody ParticipantDTO participantDTO) {
-        ParticipantDTO newParticipant = participantService.addParticipant(participantDTO);
-        return ResponseEntity.ok(newParticipant);
+    public ResponseEntity<String> addParticipant(@RequestBody ParticipantDTO participantDTO) {
+        boolean joined = participantService.toggleParticipant(participantDTO.getUserId(), participantDTO.getEventId());
+        return ResponseEntity.ok(joined ? "Joined event" : "Event is full or already joined.");
+    }
+    
+    @PutMapping("/toggle")
+    public ResponseEntity<String> toggleParticipant(
+            @RequestParam Long userId,
+            @RequestParam Long eventId) {
+        boolean joined = participantService.toggleParticipant(userId, eventId);
+        return ResponseEntity.ok(joined ? "✅ Joined event" : "❌ Left event");
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ParticipantDTO> getParticipantById(@PathVariable Long id) {
-        ParticipantDTO participant = participantService.getParticipantById(id);
-        return participant != null ? ResponseEntity.ok(participant) : ResponseEntity.notFound().build();
+   
+    @DeleteMapping
+    public ResponseEntity<String> removeParticipant(@RequestParam Long userId, @RequestParam Long eventId) {
+        boolean left = participantService.toggleParticipant(userId, eventId);
+        return ResponseEntity.ok(left ? "Left event" : "Not part of the event.");
     }
 
+    
     @GetMapping
     public ResponseEntity<List<ParticipantDTO>> getAllParticipants() {
-        List<ParticipantDTO> participants = participantService.getAllParticipants();
-        return ResponseEntity.ok(participants);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteParticipant(@PathVariable Long id) {
-        boolean isDeleted = participantService.deleteParticipant(id);
-        return isDeleted ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<ParticipantDTO> updateParticipant(@PathVariable Long id, @RequestBody ParticipantDTO participantDTO) {
-        ParticipantDTO updatedParticipant = participantService.updateParticipant(id, participantDTO);
-        return updatedParticipant != null ? ResponseEntity.ok(updatedParticipant) : ResponseEntity.notFound().build();
+        return ResponseEntity.ok(participantService.getAllParticipants());
     }
 }

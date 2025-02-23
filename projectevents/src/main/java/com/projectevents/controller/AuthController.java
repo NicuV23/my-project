@@ -1,15 +1,17 @@
 package com.projectevents.controller;
 
 import com.projectevents.dto.UserDTO;
-import com.projectevents.entity.User;
 import com.projectevents.security.JwtUtil;
-import com.projectevents.service.LoginService;
 import com.projectevents.service.UserService;
 import com.projectevents.service.UserService.UsernameAlreadyExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,20 +23,24 @@ public class AuthController {
     private JwtUtil jwtUtil;
 
     @Autowired
-    private LoginService loginService;
+    private AuthenticationManager authenticationManager;
 
     @Autowired
     private UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthRequest authRequest) {
-        try {
-            User user = loginService.authenticate(authRequest.getUsername(), authRequest.getPassword());
-            final String jwt = jwtUtil.generateToken(user.getUsername());
-            return ResponseEntity.ok(new AuthResponse(jwt));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Authentication failed: " + e.getMessage());
-        }
+    public ResponseEntity<?> login(@RequestBody AuthRequest request) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        Long userId = userService.getUserIdByUsername(userDetails.getUsername()); 
+
+        String jwt = jwtUtil.generateToken(userDetails.getUsername(), userId); 
+
+        return ResponseEntity.ok(new AuthResponse(jwt, userId)); 
     }
 
     @PostMapping("/register")
@@ -74,13 +80,19 @@ public class AuthController {
 
     static class AuthResponse {
         private final String jwt;
+        private final Long userId; 
 
-        public AuthResponse(String jwt) {
+        public AuthResponse(String jwt, Long userId) {
             this.jwt = jwt;
+            this.userId = userId;
         }
 
         public String getJwt() {
             return jwt;
+        }
+
+        public Long getUserId() {
+            return userId;
         }
     }
 }
