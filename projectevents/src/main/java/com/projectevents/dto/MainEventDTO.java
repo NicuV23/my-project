@@ -3,6 +3,9 @@ package com.projectevents.dto;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+//serveste ca container pentru a transporta datele in aplicatie
+//getteri si setteri esentiali pentru a lucra cu datele
+
 public class MainEventDTO {
     private Long eventId;
     private String name;
