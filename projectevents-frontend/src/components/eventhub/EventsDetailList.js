@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom"; // ✅ Importăm useNavigate
 import { ChatSection } from "./ChatSection";
 
 const apiBaseUrl = "http://localhost:8080/api";
 
 export const EventDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate(); // ✅ Folosim navigate pentru butonul de back
   const [event, setEvent] = useState(null);
   const [chatMessages, setChatMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [isJoined, setIsJoined] = useState(false);
-  const [currentUserId] = useState(1);
+  const [isOwner, setIsOwner] = useState(false);
+  const [currentParticipants, setCurrentParticipants] = useState(0);
+  const currentUserId = parseInt(localStorage.getItem("userId"), 10);
 
   useEffect(() => {
     const fetchEventDetails = async () => {
@@ -18,49 +21,53 @@ export const EventDetails = () => {
         const response = await fetch(`${apiBaseUrl}/main-events/${id}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem("jwt")}` },
         });
+
         if (!response.ok) throw new Error("Failed to fetch event details");
 
         const data = await response.json();
-
-        data.currentParticipants = data.currentParticipants ?? 0;
-
         setEvent(data);
+        setCurrentParticipants(data.currentParticipants);
 
-        const participantsResponse = await fetch(`${apiBaseUrl}/participants`, {
+        // Check if user is the creator
+        setIsOwner(data.creatorId === currentUserId);
+
+        // Fetch participants
+        const participantsResponse = await fetch(`${apiBaseUrl}/participants?eventId=${id}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem("jwt")}` },
         });
 
-        if (!participantsResponse.ok)
-          throw new Error("Failed to fetch participants");
+        if (!participantsResponse.ok) throw new Error("Failed to fetch participants");
 
         const participants = await participantsResponse.json();
-        const userIsJoined = participants.some(
-          (p) => p.userId === currentUserId && p.eventId === Number(id)
-        );
+        setIsJoined(participants.some((p) => p.userId === currentUserId));
 
-        setIsJoined(userIsJoined);
-
+        // Fetch chat messages
         if (data.chatId) {
-          const chatResponse = await fetch(
-            `${apiBaseUrl}/messages/chats/${data.chatId}/messages`,
-            {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-              },
-            }
-          );
-          if (!chatResponse.ok)
-            throw new Error("Failed to fetch chat messages");
-
-          setChatMessages(await chatResponse.json());
+          fetchChatMessages(data.chatId);
         }
       } catch (error) {
-        console.error("Error:", error);
+        console.error("Error fetching event details:", error);
       }
     };
 
     fetchEventDetails();
   }, [id, currentUserId]);
+
+  // Function to fetch chat messages
+  const fetchChatMessages = async (chatId) => {
+    try {
+      const chatResponse = await fetch(`${apiBaseUrl}/messages/chats/${chatId}/messages`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("jwt")}` },
+      });
+
+      if (!chatResponse.ok) throw new Error("Failed to fetch chat messages");
+
+      const chatData = await chatResponse.json();
+      setChatMessages(chatData);
+    } catch (error) {
+      console.error("Error fetching chat messages:", error);
+    }
+  };
 
   const handleToggleJoin = async () => {
     try {
@@ -77,14 +84,16 @@ export const EventDetails = () => {
 
       if (!response.ok) throw new Error("Failed to toggle participation");
 
-      setIsJoined(!isJoined);
+      // Fetch updated event data after join/leave
+      const updatedResponse = await fetch(`${apiBaseUrl}/main-events/${id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("jwt")}` },
+      });
 
-      setEvent((prevEvent) => ({
-        ...prevEvent,
-        currentParticipants: isJoined
-          ? prevEvent.currentParticipants - 1
-          : prevEvent.currentParticipants + 1,
-      }));
+      if (!updatedResponse.ok) throw new Error("Failed to fetch updated event");
+
+      const updatedEvent = await updatedResponse.json();
+      setCurrentParticipants(updatedEvent.currentParticipants);
+      setIsJoined(!isJoined);
     } catch (error) {
       console.error("Error toggling participation:", error);
     }
@@ -92,6 +101,7 @@ export const EventDetails = () => {
 
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !event?.chatId) return;
+
     try {
       const response = await fetch(
         `${apiBaseUrl}/messages/chats/${event.chatId}/messages`,
@@ -107,10 +117,11 @@ export const EventDetails = () => {
           }),
         }
       );
+
       if (!response.ok) throw new Error("Failed to send message");
 
       const newMessageData = await response.json();
-      setChatMessages((prev) => [...prev, newMessageData]);
+      setChatMessages((prev) => [...prev, newMessageData]); // Append new message
       setNewMessage("");
     } catch (error) {
       console.error("Failed to send message:", error.message);
@@ -122,6 +133,14 @@ export const EventDetails = () => {
   return (
     <div className="bg-[#0a0a0a] min-h-screen w-full font-[Inter] pt-20">
       <div className="max-w-4xl mx-auto">
+        {/* 🔙 Butonul de Back */}
+        <button
+          onClick={() => navigate("/home")}
+          className="px-4 py-2 mb-4 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition"
+        >
+          Back
+        </button>
+
         <h1 className="text-3xl font-bold text-white mb-2">{event.name}</h1>
         <div className="flex justify-between items-start mb-6">
           <div>
@@ -131,20 +150,30 @@ export const EventDetails = () => {
             <p className="text-gray-300 mb-6">{event.description}</p>
             <p className="text-gray-300">
               <strong>
-                {event.currentParticipants ?? 0}/{event.maxParticipants ?? 0}
+                {currentParticipants} / {event.maxParticipants}
               </strong>{" "}
               participants
             </p>
           </div>
-          <button
-            onClick={handleToggleJoin}
-            className={`px-6 py-2 rounded-lg ${
-              isJoined ? "bg-gray-600" : "bg-red-600"
-            } text-white`}
-          >
-            {isJoined ? "Leave Event" : "Join Event"}
-          </button>
+
+          {isOwner ? (
+            <button className="px-6 py-2 rounded-lg bg-gray-600 text-white cursor-not-allowed">
+              You are the creator
+            </button>
+          ) : currentParticipants >= event.maxParticipants ? (
+            <button className="px-6 py-2 rounded-lg bg-gray-600 text-white cursor-not-allowed">
+              Event is Full
+            </button>
+          ) : (
+            <button
+              onClick={handleToggleJoin}
+              className={`px-6 py-2 rounded-lg ${isJoined ? "bg-gray-600" : "bg-red-600"} text-white`}
+            >
+              {isJoined ? "Leave Event" : "Join Event"}
+            </button>
+          )}
         </div>
+
         <ChatSection
           chat={chatMessages}
           newMessage={newMessage}

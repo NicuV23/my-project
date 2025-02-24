@@ -26,6 +26,10 @@ public class MainEventService {
     @Autowired
     private ChatRepository chatRepository;
 
+    @Autowired
+    private ParticipantService participantService; // 🔥 Adăugat pentru a gestiona participanții
+
+    // ✅ Creare eveniment și adăugare automată a creatorului ca participant
     public MainEventDTO createMainEvent(MainEventDTO mainEventDTO) {
         MainEvent mainEvent = new MainEvent();
         mainEvent.setName(mainEventDTO.getName());
@@ -34,8 +38,13 @@ public class MainEventService {
         mainEvent.setEventDate(mainEventDTO.getEventDate());
         mainEvent.setEventTime(mainEventDTO.getEventTime());
         mainEvent.setDescription(mainEventDTO.getDescription());
-        mainEvent.setCreatorId(mainEventDTO.getCreatorId()); 
+        mainEvent.setCreatorId(mainEventDTO.getCreatorId());
+        mainEvent.setCurrentParticipants(1); // ✅ Setăm inițial un participant (creatorul)
 
+        Chat newChat = new Chat();
+        chatRepository.save(newChat);
+        mainEvent.setChatId(newChat.getChatId()); 
+        
         GameType gameType = gameTypeRepository.findById(mainEventDTO.getGameTypeId())
             .orElseThrow(() -> new IllegalArgumentException("Invalid gameTypeId: " + mainEventDTO.getGameTypeId()));
         mainEvent.setGameType(gameType);
@@ -48,6 +57,9 @@ public class MainEventService {
 
         mainEvent = mainEventRepository.save(mainEvent);
 
+        // ✅ Adaugă automat creatorul ca participant
+        participantService.toggleParticipant(mainEvent.getCreatorId(), mainEvent.getEventId());
+
         return new MainEventDTO(
             mainEvent.getEventId(),
             mainEvent.getName(),
@@ -58,24 +70,32 @@ public class MainEventService {
             mainEvent.getEventDate(),
             mainEvent.getEventTime(),
             mainEvent.getDescription(),
-            mainEvent.getCreatorId() 
+            mainEvent.getCreatorId(),
+            mainEvent.getCurrentParticipants()
         );
     }
 
-    
-    public List<MainEventDTO> getEventsByUser(Long userId) {
-        List<MainEvent> events = mainEventRepository.findByCreatorId(userId);
+    // ✅ Returnează toate evenimentele cu numărul real de participanți
+    public List<MainEventDTO> findAllEvents() {
+        List<MainEvent> events = mainEventRepository.findAll();
         return events.stream()
             .map(event -> new MainEventDTO(
-                event.getEventId(), event.getName(), event.getLocation(),
-                event.getMaxParticipants(), event.getGameTypeId(), event.getChatId(),
-                event.getEventDate(), event.getEventTime(), event.getDescription(),
-                event.getCreatorId()  
+                event.getEventId(),
+                event.getName(),
+                event.getLocation(),
+                event.getMaxParticipants(),
+                event.getGameTypeId(),
+                event.getChatId(),
+                event.getEventDate(),
+                event.getEventTime(),
+                event.getDescription(),
+                event.getCreatorId(),
+                event.getCurrentParticipants() 
             ))
             .collect(Collectors.toList());
     }
 
-
+    //  Returnează un eveniment după ID
     public MainEventDTO getMainEventById(Long id) {
         return mainEventRepository.findById(id)
             .map(event -> new MainEventDTO(
@@ -83,20 +103,38 @@ public class MainEventService {
                 event.getName(),
                 event.getLocation(),
                 event.getMaxParticipants(),
-                event.getChatId(),
                 event.getGameTypeId(),
+                event.getChatId(),
                 event.getEventDate(),
                 event.getEventTime(),
                 event.getDescription(),
-                event.getCreatorId()
+                event.getCreatorId(),
+                event.getCurrentParticipants()
             ))
             .orElse(null);
     }
 
-    public List<MainEvent> findAllEvents() {
-        return mainEventRepository.findAll();
+    //  Returnează toate evenimentele unui utilizator (comentariile mele)
+    public List<MainEventDTO> getEventsByUser(Long userId) {
+        List<MainEvent> events = mainEventRepository.findByCreatorId(userId);
+        return events.stream()
+            .map(event -> new MainEventDTO(
+                event.getEventId(),
+                event.getName(),
+                event.getLocation(),
+                event.getMaxParticipants(),
+                event.getGameTypeId(),
+                event.getChatId(),
+                event.getEventDate(),
+                event.getEventTime(),
+                event.getDescription(),
+                event.getCreatorId(),
+                event.getCurrentParticipants() 
+            ))
+            .collect(Collectors.toList());
     }
 
+    //  Update eveniment (păstrează participanții actuali)
     public MainEventDTO updateMainEvent(Long id, MainEventDTO mainEventDTO) {
         return mainEventRepository.findById(id).map(event -> {
             event.setName(mainEventDTO.getName());
@@ -116,18 +154,21 @@ public class MainEventService {
                 event.setChatId(chat.getChatId());
             }
 
+            event.setCurrentParticipants(mainEventDTO.getCurrentParticipants());
+
             mainEventRepository.save(event);
             return new MainEventDTO(
                 event.getEventId(),
                 event.getName(),
                 event.getLocation(),
                 event.getMaxParticipants(),
-                event.getChatId(),
                 event.getGameTypeId(),
+                event.getChatId(),
                 event.getEventDate(),
                 event.getEventTime(),
                 event.getDescription(),
-                event.getCreatorId()
+                event.getCreatorId(),
+                event.getCurrentParticipants()
             );
         }).orElse(null);
     }

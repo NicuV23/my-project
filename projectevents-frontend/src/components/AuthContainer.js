@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { LoginForm } from "./LoginForm";
 import { useNavigate } from "react-router-dom";
 import { RegisterForm } from "./RegisterForm";
-import { ForgotPasswordForm } from "./ForgotPasswordForm";
 
 const AuthContainer = () => {
   const [currentView, setCurrentView] = useState("login");
@@ -21,8 +20,6 @@ const AuthContainer = () => {
         return <LoginForm onViewChange={setCurrentView} />;
       case "register":
         return <RegisterForm onViewChange={setCurrentView} />;
-      case "forgot":
-        return <ForgotPasswordForm onViewChange={setCurrentView} />;
       default:
         return null;
     }

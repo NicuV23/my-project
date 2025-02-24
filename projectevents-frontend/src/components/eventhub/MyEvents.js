@@ -8,12 +8,12 @@ const MyEvents = () => {
   const [events, setEvents] = useState([]);
   const [gameTypes, setGameTypes] = useState({});
   const [currentUserId, setCurrentUserId] = useState(null);
+  const [selectedGameType, setSelectedGameType] = useState(""); // 🔥 Filtru
 
   useEffect(() => {
     const userIdFromStorage = localStorage.getItem("userId");
     if (userIdFromStorage) {
       setCurrentUserId(parseInt(userIdFromStorage, 10));
-      console.log("User ID from localStorage:", userIdFromStorage);
     }
   }, []);
 
@@ -55,7 +55,6 @@ const MyEvents = () => {
 
           const data = await response.json();
           setEvents(data);
-          console.log("My events fetched:", data);
         } catch (error) {
           console.error("Error fetching my events:", error);
         }
@@ -65,12 +64,40 @@ const MyEvents = () => {
     }
   }, [currentUserId]);
 
+  // ✅ Funcție pentru eliminarea evenimentului șters
+  const handleDeleteEvent = (deletedEventId) => {
+    setEvents((prevEvents) => prevEvents.filter(event => event.eventId !== deletedEventId));
+  };
+
+  // ✅ Aplicăm filtrul de evenimente după gameTypeId
+  const filteredEvents = selectedGameType
+    ? events.filter(event => event.gameTypeId === parseInt(selectedGameType, 10))
+    : events;
+
   return (
     <div className="bg-[#0a0a0a] min-h-screen w-full font-[Inter]">
       <Navigation />
       <main className="container mx-auto px-4 pt-20">
         <h2 className="text-white text-2xl mb-4">My Events</h2>
-        <MyEventList events={events} gameTypes={gameTypes} />
+
+        {/* 🔥 Dropdown pentru filtrare */}
+        <div className="mb-4">
+          <label className="text-white mr-2">Filter by Category:</label>
+          <select
+            className="px-3 py-2 bg-[#111] text-white border border-gray-700 rounded-lg "
+            value={selectedGameType}
+            onChange={(e) => setSelectedGameType(e.target.value)}
+          >
+            <option value="">All Categories</option>
+            {Object.entries(gameTypes).map(([id, name]) => (
+              <option key={id} value={id}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <MyEventList events={filteredEvents} gameTypes={gameTypes} onDelete={handleDeleteEvent} />
       </main>
     </div>
   );

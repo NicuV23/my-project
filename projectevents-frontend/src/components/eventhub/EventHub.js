@@ -1,23 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Navigation from "./Navigation";
-import EventList from "./EventList";
-import CreateEvent from "./CreateEvent";
+import EventCard from "./EventCard";
 
 const apiBaseUrl = "http://localhost:8080/api";
 
 const EventHub = () => {
-  const [currentView, setCurrentView] = useState("events");
   const [events, setEvents] = useState([]);
   const [gameTypes, setGameTypes] = useState({});
-  const [currentUserId, setCurrentUserId] = useState(null);
-
-  useEffect(() => {
-    const userIdFromStorage = localStorage.getItem("userId");
-    if (userIdFromStorage) {
-      setCurrentUserId(parseInt(userIdFromStorage, 10));
-      console.log("User ID from localStorage:", userIdFromStorage);
-    }
-  }, []);
+  const [selectedGameType, setSelectedGameType] = useState(""); 
 
   useEffect(() => {
     const fetchGameTypes = async () => {
@@ -42,72 +32,56 @@ const EventHub = () => {
   }, []);
 
   useEffect(() => {
-    if (currentView === "events") {
-      const fetchEvents = async () => {
-        try {
-          const response = await fetch(`${apiBaseUrl}/main-events`, {
-            headers: { Authorization: `Bearer ${localStorage.getItem("jwt")}` },
-          });
-          if (!response.ok) throw new Error("Failed to fetch events");
+    const fetchEvents = async () => {
+      try {
+        const response = await fetch(`${apiBaseUrl}/main-events`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("jwt")}` },
+        });
+        if (!response.ok) throw new Error("Failed to fetch events");
 
-          const data = await response.json();
-          setEvents(data);
-          console.log("All events fetched:", data);
-        } catch (error) {
-          console.error("Error fetching events:", error);
-        }
-      };
+        const data = await response.json();
+        setEvents(data); 
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      }
+    };
 
-      fetchEvents();
-    }
-  }, [currentView]);
+    fetchEvents();
+  }, []);
 
-  useEffect(() => {
-    if (currentView === "myevents" && currentUserId) {
-      const fetchMyEvents = async () => {
-        try {
-          console.log("Fetching my events for user:", currentUserId);
-          const response = await fetch(
-            `${apiBaseUrl}/main-events/user/${currentUserId}`,
-            {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-              },
-            }
-          );
-          if (!response.ok) throw new Error("Failed to fetch my events");
-
-          const data = await response.json();
-          setEvents(data);
-          console.log("My events fetched:", data);
-        } catch (error) {
-          console.error("Error fetching my events:", error);
-        }
-      };
-
-      fetchMyEvents();
-    }
-  }, [currentView, currentUserId]);
+  const filteredEvents = selectedGameType
+    ? events.filter(event => event.gameTypeId === parseInt(selectedGameType, 10))
+    : events;
 
   return (
-    <div className="bg-[#0a0a0a] min-h-screen w-full font-[Inter]">
-      <Navigation currentView={currentView} setCurrentView={setCurrentView} />
+    <>
+      <Navigation />
       <main className="container mx-auto px-4 pt-20">
-        {currentView === "events" && (
-          <>
-            <h2 className="text-white text-2xl mb-4">All Events</h2>
-            <EventList events={events} gameTypes={gameTypes} />
-          </>
-        )}
-        {currentView === "myevents" && (
-          <>
-            <h2 className="text-white text-2xl mb-4">My Events</h2>
-            <EventList events={events} gameTypes={gameTypes} />
-          </>
-        )}
-        {currentView === "create" && <CreateEvent />}
+        <h2 className="text-white text-2xl mb-4">All Events</h2>
+
+        <div className="mb-4">
+          <label className="text-white mr-2">Filter by Category:</label>
+          <select
+            className="px-3 py-2 bg-[#111] text-white border border-gray-700 rounded-lg "
+            value={selectedGameType}
+            onChange={(e) => setSelectedGameType(e.target.value)}
+          >
+            <option value="">All Categories</option>
+            {Object.entries(gameTypes).map(([id, name]) => (
+              <option key={id} value={id}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredEvents.map((event) => (
+            <EventCard key={event.eventId} event={event} gameTypes={gameTypes} />
+          ))}
+        </div>
       </main>
-    </div>
+    </>
   );
 };
 

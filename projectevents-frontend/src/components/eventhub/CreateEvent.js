@@ -1,169 +1,196 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
+const apiBaseUrl = "http://localhost:8080/api";
 
 const CreateEvent = () => {
+  const navigate = useNavigate();
+  const [gameTypes, setGameTypes] = useState([]);
+  const [currentUserId, setCurrentUserId] = useState(null);
   const [formData, setFormData] = useState({
-    title: "",
+    name: "",
     description: "",
-    date: "",
-    time: "",
+    eventDate: "",
+    eventTime: "",
     location: "",
-    category: "",
+    gameTypeId: "",
     maxParticipants: "",
-    image: "",
+    creatorId: "",
+    currentParticipants: 1,
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Handle form submission
-    console.log("Form submitted:", formData);
-  };
+  useEffect(() => {
+    const userIdFromStorage = localStorage.getItem("userId");
+    if (userIdFromStorage) {
+      setCurrentUserId(parseInt(userIdFromStorage, 10));
+      setFormData((prev) => ({ ...prev, creatorId: parseInt(userIdFromStorage, 10) }));
+    }
+  }, []);
+
+  useEffect(() => {
+    const fetchGameTypes = async () => {
+      try {
+        const response = await fetch(`${apiBaseUrl}/game-types`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("jwt")}` },
+        });
+        if (!response.ok) throw new Error("Failed to fetch game types");
+
+        const data = await response.json();
+        setGameTypes(data);
+      } catch (error) {
+        console.error("Error fetching game types:", error);
+      }
+    };
+
+    fetchGameTypes();
+  }, []);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`${apiBaseUrl}/main-events`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) throw new Error("Failed to create event");
+
+      const newEvent = await response.json();
+      console.log("✅ Event created successfully!");
+
+      await fetch(
+        `${apiBaseUrl}/participants/toggle?userId=${formData.creatorId}&eventId=${newEvent.eventId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+          },
+        }
+      );
+
+      console.log("✅ Creator added as a participant!");
+      navigate("/my-events");
+    } catch (error) {
+      console.error("❌ Error creating event:", error);
+    }
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold text-white mb-6">Create New Event</h1>
+    <div className="max-w-5xl mx-auto  bg-[#111] p-6 rounded-lg shadow-md relative">
+      <button
+        onClick={() => navigate("/home")}
+        className="absolute top-4 left-4 text-white flex items-center gap-2 hover:text-gray-300 transition"
+      >
+        Back
+      </button>
+
+      <h1 className="text-2xl font-bold text-white mb-6 text-center">Create New Event</h1>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label htmlFor="title" className="block text-white mb-2">
-            Event Title
-          </label>
+          <label className="block text-white mb-2">Event Name</label>
           <input
             type="text"
-            id="title"
-            name="title"
-            value={formData.title}
+            name="name"
+            value={formData.name}
             onChange={handleChange}
-            className="w-full px-4 py-2 rounded-lg bg-[#111] text-white border border-gray-700 focus:border-red-600 focus:outline-none"
+            className="w-full px-4 py-2 bg-gray-800 text-white border border-gray-700 rounded-lg"
             required
           />
         </div>
 
         <div>
-          <label htmlFor="description" className="block text-white mb-2">
-            Description
-          </label>
+          <label className="block text-white mb-2">Description</label>
           <textarea
-            id="description"
             name="description"
             value={formData.description}
             onChange={handleChange}
             rows="4"
-            className="w-full px-4 py-2 rounded-lg bg-[#111] text-white border border-gray-700 focus:border-red-600 focus:outline-none"
+            className="w-full px-4 py-2 bg-gray-800 text-white border border-gray-700 rounded-lg"
             required
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="date" className="block text-white mb-2">
-              Date
-            </label>
+            <label className="block text-white mb-2">Date</label>
             <input
               type="date"
-              id="date"
-              name="date"
-              value={formData.date}
+              name="eventDate"
+              value={formData.eventDate}
               onChange={handleChange}
-              className="w-full px-4 py-2 rounded-lg bg-[#111] text-white border border-gray-700 focus:border-red-600 focus:outline-none"
+              className="w-full px-4 py-2 bg-gray-800 text-white border border-gray-700 rounded-lg"
               required
             />
           </div>
 
           <div>
-            <label htmlFor="time" className="block text-white mb-2">
-              Time
-            </label>
+            <label className="block text-white mb-2">Time</label>
             <input
               type="time"
-              id="time"
-              name="time"
-              value={formData.time}
+              name="eventTime"
+              value={formData.eventTime}
               onChange={handleChange}
-              className="w-full px-4 py-2 rounded-lg bg-[#111] text-white border border-gray-700 focus:border-red-600 focus:outline-none"
+              className="w-full px-4 py-2 bg-gray-800 text-white border border-gray-700 rounded-lg"
               required
             />
           </div>
         </div>
 
         <div>
-          <label htmlFor="location" className="block text-white mb-2">
-            Location
-          </label>
+          <label className="block text-white mb-2">Location</label>
           <input
             type="text"
-            id="location"
             name="location"
             value={formData.location}
             onChange={handleChange}
-            className="w-full px-4 py-2 rounded-lg bg-[#111] text-white border border-gray-700 focus:border-red-600 focus:outline-none"
+            className="w-full px-4 py-2 bg-gray-800 text-white border border-gray-700 rounded-lg"
             required
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="category" className="block text-white mb-2">
-              Category
-            </label>
-            <select
-              id="category"
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              className="w-full px-4 py-2 rounded-lg bg-[#111] text-white border border-gray-700 focus:border-red-600 focus:outline-none"
-              required
-            >
-              <option value="">Select category</option>
-              <option value="Music">Music</option>
-              <option value="Technology">Technology</option>
-              <option value="Food">Food</option>
-              <option value="Sports">Sports</option>
-              <option value="Art">Art</option>
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="maxParticipants" className="block text-white mb-2">
-              Max Participants
-            </label>
-            <input
-              type="number"
-              id="maxParticipants"
-              name="maxParticipants"
-              value={formData.maxParticipants}
-              onChange={handleChange}
-              min="1"
-              className="w-full px-4 py-2 rounded-lg bg-[#111] text-white border border-gray-700 focus:border-red-600 focus:outline-none"
-              required
-            />
-          </div>
+        <div>
+          <label className="block text-white mb-2">Category</label>
+          <select
+            name="gameTypeId"
+            value={formData.gameTypeId}
+            onChange={handleChange}
+            className="w-full px-4 py-2 bg-[#111] text-white border border-gray-700 rounded-lg "
+            required
+          >
+            <option value="">Select category</option>
+            {gameTypes.map((type) => (
+              <option key={type.id} value={type.id}>
+                {type.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>
-          <label htmlFor="image" className="block text-white mb-2">
-            Image URL
-          </label>
+          <label className="block text-white mb-2">Max Participants</label>
           <input
-            type="url"
-            id="image"
-            name="image"
-            value={formData.image}
+            type="number"
+            name="maxParticipants"
+            value={formData.maxParticipants}
             onChange={handleChange}
-            className="w-full px-4 py-2 rounded-lg bg-[#111] text-white border border-gray-700 focus:border-red-600 focus:outline-none"
+            min="1"
+            className="w-full px-4 py-2 bg-gray-800 text-white border border-gray-700 rounded-lg"
             required
           />
         </div>
 
         <button
           type="submit"
-          className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition-colors"
+          className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition"
         >
           Create Event
         </button>

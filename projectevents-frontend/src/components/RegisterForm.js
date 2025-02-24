@@ -10,10 +10,30 @@ export const RegisterForm = ({ onViewChange }) => {
     password: "",
   });
   const [loading, setLoading] = React.useState(false);
+  const [emailError, setEmailError] = React.useState("");
+  const [passwordError, setPasswordError] = React.useState("");
+
+  const validateEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
+    if (!validateEmail(formData.email)) {
+      setEmailError("Invalid email format");
+      toast.error("Invalid email format");
+      setLoading(false);
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setPasswordError("Password must be at least 6 characters long");
+      toast.error("Password must be at least 6 characters long");
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await fetch(`${apiBaseUrl}/register`, {
@@ -29,7 +49,6 @@ export const RegisterForm = ({ onViewChange }) => {
       }
 
       toast.success("Account created successfully!");
-      console.log("✅ Registration successful:", data);
       setTimeout(() => onViewChange("login"), 1500);
     } catch (error) {
       console.error("❌ Registration error:", error);
@@ -41,6 +60,8 @@ export const RegisterForm = ({ onViewChange }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === "email") setEmailError("");
+    if (name === "password") setPasswordError("");
   };
 
   return (
@@ -48,9 +69,7 @@ export const RegisterForm = ({ onViewChange }) => {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-white">Create an account</h2>
-          <p className="text-gray-400 mt-2">
-            Join EventHub to discover amazing events
-          </p>
+          <p className="text-gray-400 mt-2">Join EventHub to discover amazing events</p>
         </div>
 
         <div className="space-y-4">
@@ -82,6 +101,7 @@ export const RegisterForm = ({ onViewChange }) => {
               placeholder="Enter your email"
               required
             />
+            {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
           </div>
 
           <div>
@@ -97,6 +117,7 @@ export const RegisterForm = ({ onViewChange }) => {
               placeholder="Create a password"
               required
             />
+            {passwordError && <p className="text-red-500 text-sm mt-1">{passwordError}</p>}
           </div>
         </div>
 

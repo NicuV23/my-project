@@ -6,6 +6,7 @@ const apiBaseUrl = "http://localhost:8080/api";
 const MyEventEdit = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [gameTypes, setGameTypes] = useState([]); // 🔥 Stocăm categoriile
   const [eventData, setEventData] = useState({
     name: "",
     location: "",
@@ -13,8 +14,29 @@ const MyEventEdit = () => {
     eventDate: "",
     eventTime: "",
     description: "",
+    gameTypeId: "", // 🔥 Stocăm categoria selectată
   });
 
+  // 📌 Fetch game types (categorii)
+  useEffect(() => {
+    const fetchGameTypes = async () => {
+      try {
+        const response = await fetch(`${apiBaseUrl}/game-types`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("jwt")}` },
+        });
+        if (!response.ok) throw new Error("Failed to fetch game types");
+
+        const data = await response.json();
+        setGameTypes(data);
+      } catch (error) {
+        console.error("Error fetching game types:", error);
+      }
+    };
+
+    fetchGameTypes();
+  }, []);
+
+  // 📌 Fetch event data
   useEffect(() => {
     const fetchEvent = async () => {
       try {
@@ -54,7 +76,7 @@ const MyEventEdit = () => {
       if (!response.ok) throw new Error("Failed to update event");
 
       console.log("✅ Event updated successfully!");
-      navigate("/my-events"); 
+      navigate("/my-events");
     } catch (error) {
       console.error("❌ Error updating event:", error);
     }
@@ -62,7 +84,7 @@ const MyEventEdit = () => {
 
   return (
     <div className="bg-[#0a0a0a] min-h-screen w-full font-[Inter] pt-20">
-      <div className="max-w-3xl mx-auto bg-gray-900 p-6 rounded-lg shadow-md">
+      <div className="max-w-3xl mx-auto bg-[#111] p-6 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold text-white mb-4">Edit Event</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -78,6 +100,7 @@ const MyEventEdit = () => {
               required
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-300">
               Location
@@ -91,6 +114,7 @@ const MyEventEdit = () => {
               required
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-300">
               Max Participants
@@ -104,6 +128,7 @@ const MyEventEdit = () => {
               required
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-300">
               Date
@@ -117,6 +142,7 @@ const MyEventEdit = () => {
               required
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-300">
               Time
@@ -130,6 +156,7 @@ const MyEventEdit = () => {
               required
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-300">
               Description
@@ -143,12 +170,35 @@ const MyEventEdit = () => {
               required
             ></textarea>
           </div>
+
+          {/* 🔥 Dropdown pentru categorie (preluată din API) */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300">
+              Category
+            </label>
+            <select
+              name="gameTypeId"
+              value={eventData.gameTypeId}
+              onChange={handleChange}
+              className="w-full px-4 py-2 bg-gray-800 text-white border border-gray-700 rounded-lg"
+              required
+            >
+              <option value="">Select category</option>
+              {gameTypes.map((type) => (
+                <option key={type.id} value={type.id}>
+                  {type.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <button
             type="submit"
             className="w-full bg-red-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-red-700 transition"
           >
             Save Changes
           </button>
+
           <button
             type="button"
             onClick={() => navigate("/my-events")}

@@ -14,6 +14,18 @@ export const LoginForm = ({ onViewChange }) => {
     e.preventDefault();
     setLoading(true);
 
+    if (username.length < 3 || username.length > 20) {
+      toast.error("Username must be between 3 and 20 characters");
+      setLoading(false);
+      return;
+    }
+
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch(`${apiBaseUrl}/login`, {
         method: "POST",
@@ -22,25 +34,19 @@ export const LoginForm = ({ onViewChange }) => {
       });
 
       const data = await response.json();
-      console.log("API Response:", data);
-
       if (!response.ok) {
         toast.error(data.error || "Login failed!");
         throw new Error(data.error || "Login failed!");
       }
 
       localStorage.setItem("jwt", data.jwt);
-      if (data.userId) {
-        localStorage.setItem("userId", String(data.userId));
-        console.log("User ID saved in localStorage:", data.userId);
-      } else {
-        console.error("userId is missing from API response!");
-      }
+      if (data.userId) localStorage.setItem("userId", String(data.userId));
 
       toast.success("Login successful! Redirecting...");
       setTimeout(() => navigate("/home"), 1500);
     } catch (error) {
       console.error("Error:", error);
+      toast.error("An error occurred. Please try again.");
     } finally {
       setLoading(false);
     }

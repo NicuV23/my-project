@@ -1,9 +1,15 @@
-export const ChatSection = ({
-  chat = [],
-  newMessage,
-  setNewMessage,
-  onSendMessage,
-}) => {
+export const ChatSection = ({ chat = [], newMessage, setNewMessage, onSendMessage }) => {
+  const handleSend = async () => {
+    if (!newMessage.trim()) return;
+
+    try {
+      await onSendMessage(); // Send message
+      setNewMessage(""); // Clear input
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  };
+
   return (
     <div className="bg-[#111] rounded-lg p-4 mt-6">
       <h3 className="text-xl font-semibold text-white mb-4">Event Chat</h3>
@@ -14,11 +20,10 @@ export const ChatSection = ({
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-white">
-                    User {message.senderId}
-                  </span>{" "}
-                  {/* Adjust if you have username */}
+                    {message.senderUsername || `User ${message.senderId}`}
+                  </span>
                   <span className="text-gray-400 text-sm">
-                    {new Date(message.timestamp).toLocaleTimeString()}
+                    {message.timestamp ? new Date(message.timestamp).toLocaleTimeString() : "Just now"}
                   </span>
                 </div>
                 <p className="text-gray-300">{message.content}</p>
@@ -37,10 +42,7 @@ export const ChatSection = ({
           className="flex-1 bg-[#222] text-white rounded px-4 py-2"
           placeholder="Type your message..."
         />
-        <button
-          onClick={onSendMessage}
-          className="bg-red-600 text-white px-4 py-2 rounded"
-        >
+        <button onClick={handleSend} className="bg-red-600 text-white px-4 py-2 rounded">
           Send
         </button>
       </div>
