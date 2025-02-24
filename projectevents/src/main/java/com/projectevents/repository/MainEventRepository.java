@@ -11,3 +11,6 @@ public interface MainEventRepository extends JpaRepository<MainEvent, Long> {
 	List<MainEvent> findByCreatorId(Long userId);
 
 }
+
+
+//Extinde JpaRepository, ceea ce înseamnă că moștenește metode pentru operații CRUD (Create, Read, Update, Delete) pentru entitățile MainEvent.

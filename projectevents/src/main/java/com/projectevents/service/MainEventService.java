@@ -14,6 +14,12 @@ import com.projectevents.repository.ChatRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
+//Acest serviciu folosește diverse repository-uri pentru a interacționa
+//cu baza de date 
+//și un serviciu suplimentar pentru gestionarea
+//participanților la evenimente.
+
 @Service
 public class MainEventService {
 
@@ -27,9 +33,9 @@ public class MainEventService {
     private ChatRepository chatRepository;
 
     @Autowired
-    private ParticipantService participantService; // 🔥 Adăugat pentru a gestiona participanții
+    private ParticipantService participantService; 
 
-    // ✅ Creare eveniment și adăugare automată a creatorului ca participant
+    //  Creare eveniment și adăugare automată a creatorului ca participant
     public MainEventDTO createMainEvent(MainEventDTO mainEventDTO) {
         MainEvent mainEvent = new MainEvent();
         mainEvent.setName(mainEventDTO.getName());
@@ -39,7 +45,7 @@ public class MainEventService {
         mainEvent.setEventTime(mainEventDTO.getEventTime());
         mainEvent.setDescription(mainEventDTO.getDescription());
         mainEvent.setCreatorId(mainEventDTO.getCreatorId());
-        mainEvent.setCurrentParticipants(1); // ✅ Setăm inițial un participant (creatorul)
+        mainEvent.setCurrentParticipants(1); 
 
         Chat newChat = new Chat();
         chatRepository.save(newChat);
@@ -57,7 +63,7 @@ public class MainEventService {
 
         mainEvent = mainEventRepository.save(mainEvent);
 
-        // ✅ Adaugă automat creatorul ca participant
+        //  Adaugă automat creatorul ca participant
         participantService.toggleParticipant(mainEvent.getCreatorId(), mainEvent.getEventId());
 
         return new MainEventDTO(
@@ -75,7 +81,7 @@ public class MainEventService {
         );
     }
 
-    // ✅ Returnează toate evenimentele cu numărul real de participanți
+    //  Returnează toate evenimentele cu numărul real de participanți
     public List<MainEventDTO> findAllEvents() {
         List<MainEvent> events = mainEventRepository.findAll();
         return events.stream()
