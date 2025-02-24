@@ -1,6 +1,37 @@
-# Getting Started with Create React App
+# ProjectEvents Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+ProjectEvents is a web application that allows users to discover, join, and create events. The frontend is built with React and Tailwind CSS.
+
+## Project Description
+
+ProjectEvents is designed to help users find and participate in events happening in their area. Users can create new events, join existing ones, and interact with other participants through a chat feature. The application provides a user-friendly interface for managing events and participants.
+
+## Setup and Run Instructions
+
+### Prerequisites
+
+- Node.js (v14 or higher)
+- npm (v6 or higher)
+
+### Installation
+
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/your-username/projectevents-frontend.git
+   cd projectevents-frontend
+   ```
+
+2. Install dependencies:
+   ```sh
+   npm install
+   ```
+
+3. Start the development server:
+   ```sh
+   npm start
+   ```
+
+   Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
 ## Available Scripts
 
@@ -39,32 +70,33 @@ Instead, it will copy all the configuration files and the transitive dependencie
 
 You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
+## API Endpoints
+
+### User Authentication
+
+- `POST /register`: Register a new user.
+- `POST /login`: Authenticate a user and return a JWT.
+
+### Events
+
+- `GET /main-events`: Retrieve a list of all events.
+- `GET /main-events/:id`: Retrieve details of a specific event.
+- `POST /main-events`: Create a new event.
+- `PUT /main-events/:id`: Update an existing event.
+- `DELETE /main-events/:id`: Delete an event.
+
+### Participants
+
+- `GET /participants?eventId=:eventId`: Retrieve a list of participants for a specific event.
+- `PUT /participants/toggle?userId=:userId&eventId=:eventId`: Toggle participation for a user in an event.
+
+### Chat
+
+- `GET /messages/chats/:chatId/messages`: Retrieve chat messages for a specific chat.
+- `POST /messages/chats/:chatId/messages`: Send a new chat message.
+
 ## Learn More
 
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
