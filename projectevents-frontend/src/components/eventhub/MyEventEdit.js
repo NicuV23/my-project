@@ -6,7 +6,7 @@ const apiBaseUrl = "http://localhost:8080/api";
 const MyEventEdit = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [gameTypes, setGameTypes] = useState([]); // 🔥 Stocăm categoriile
+  const [gameTypes, setGameTypes] = useState([]); 
   const [eventData, setEventData] = useState({
     name: "",
     location: "",
@@ -14,10 +14,9 @@ const MyEventEdit = () => {
     eventDate: "",
     eventTime: "",
     description: "",
-    gameTypeId: "", // 🔥 Stocăm categoria selectată
+    gameTypeId: "", 
   });
 
-  // 📌 Fetch game types (categorii)
   useEffect(() => {
     const fetchGameTypes = async () => {
       try {
@@ -36,7 +35,6 @@ const MyEventEdit = () => {
     fetchGameTypes();
   }, []);
 
-  // 📌 Fetch event data
   useEffect(() => {
     const fetchEvent = async () => {
       try {
@@ -171,7 +169,6 @@ const MyEventEdit = () => {
             ></textarea>
           </div>
 
-          {/* 🔥 Dropdown pentru categorie (preluată din API) */}
           <div>
             <label className="block text-sm font-medium text-gray-300">
               Category

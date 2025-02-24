@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ChatSection } from "./ChatSection";  // Asumând că aveți această componentă
+import { ChatSection } from "./ChatSection"; 
 
 const apiBaseUrl = "http://localhost:8080/api";
 
@@ -23,7 +23,6 @@ const MyEventDetails = () => {
         const data = await response.json();
         setEvent(data);
 
-        // Assuming we have a chatId available in the event details
         if (data.chatId) {
           fetchChatMessages(data.chatId);
         }

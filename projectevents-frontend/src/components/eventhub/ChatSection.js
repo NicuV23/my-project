@@ -3,7 +3,7 @@ export const ChatSection = ({ chat = [], newMessage, setNewMessage, onSendMessag
     if (!newMessage.trim()) return;
 
     try {
-      await onSendMessage(); // Send message
+      await onSendMessage(); 
       setNewMessage(""); // Clear input
     } catch (error) {
       console.error("Error sending message:", error);

@@ -64,12 +64,10 @@ const MyEvents = () => {
     }
   }, [currentUserId]);
 
-  // ✅ Funcție pentru eliminarea evenimentului șters
   const handleDeleteEvent = (deletedEventId) => {
     setEvents((prevEvents) => prevEvents.filter(event => event.eventId !== deletedEventId));
   };
 
-  // ✅ Aplicăm filtrul de evenimente după gameTypeId
   const filteredEvents = selectedGameType
     ? events.filter(event => event.gameTypeId === parseInt(selectedGameType, 10))
     : events;
@@ -80,7 +78,6 @@ const MyEvents = () => {
       <main className="container mx-auto px-4 pt-20">
         <h2 className="text-white text-2xl mb-4">My Events</h2>
 
-        {/* 🔥 Dropdown pentru filtrare */}
         <div className="mb-4">
           <label className="text-white mr-2">Filter by Category:</label>
           <select

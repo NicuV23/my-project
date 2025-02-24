@@ -6,7 +6,7 @@ const apiBaseUrl = "http://localhost:8080/api";
 
 export const EventDetails = () => {
   const { id } = useParams();
-  const navigate = useNavigate(); // ✅ Folosim navigate pentru butonul de back
+  const navigate = useNavigate(); 
   const [event, setEvent] = useState(null);
   const [chatMessages, setChatMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
@@ -53,7 +53,6 @@ export const EventDetails = () => {
     fetchEventDetails();
   }, [id, currentUserId]);
 
-  // Function to fetch chat messages
   const fetchChatMessages = async (chatId) => {
     try {
       const chatResponse = await fetch(`${apiBaseUrl}/messages/chats/${chatId}/messages`, {
@@ -84,7 +83,6 @@ export const EventDetails = () => {
 
       if (!response.ok) throw new Error("Failed to toggle participation");
 
-      // Fetch updated event data after join/leave
       const updatedResponse = await fetch(`${apiBaseUrl}/main-events/${id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("jwt")}` },
       });
@@ -133,7 +131,6 @@ export const EventDetails = () => {
   return (
     <div className="bg-[#0a0a0a] min-h-screen w-full font-[Inter] pt-20">
       <div className="max-w-4xl mx-auto">
-        {/* 🔙 Butonul de Back */}
         <button
           onClick={() => navigate("/home")}
           className="px-4 py-2 mb-4 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition"
