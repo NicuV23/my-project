@@ -19,6 +19,8 @@ public class MainEventConverter {
             mainEvent.getCreatorId()     
         );
     }
+    
+    //folosesc static pentru acces direct a instantia obiectul, memorie redusa
 
     public static MainEvent dtoToEntity(MainEventDTO mainEventDTO) {
         MainEvent mainEvent = new MainEvent();
