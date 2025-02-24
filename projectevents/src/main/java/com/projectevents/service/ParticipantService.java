@@ -29,16 +29,13 @@ public class ParticipantService {
 
    
     public boolean toggleParticipant(Long userId, Long eventId) {
-    	Optional<Participant> existingParticipant = participantRepository.findByUser_IdAndEvent_EventId(userId, eventId);
+        Optional<Participant> existingParticipant = participantRepository.findByUser_IdAndEvent_EventId(userId, eventId);
 
-        
         if (existingParticipant.isPresent()) {
-           
             participantRepository.delete(existingParticipant.get());
             updateParticipantCount(eventId, -1);
             return false;
         } else {
-            
             User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
             MainEvent event = mainEventRepository.findById(eventId)
@@ -52,7 +49,6 @@ public class ParticipantService {
             newParticipant.setUser(user);
             newParticipant.setEvent(event);
             newParticipant.setStatus("active");
-
             participantRepository.save(newParticipant);
             updateParticipantCount(eventId, 1);
             return true; 
@@ -63,9 +59,9 @@ public class ParticipantService {
         MainEvent event = mainEventRepository.findById(eventId)
             .orElseThrow(() -> new RuntimeException("Event not found"));
         event.setCurrentParticipants(
-        	    (event.getCurrentParticipants() != null ? event.getCurrentParticipants() : 0) + change
-        	);
-
+            (event.getCurrentParticipants() != null ? event.getCurrentParticipants() : 0) + change
+        );
+        mainEventRepository.save(event);
     }
 
     public List<ParticipantDTO> getAllParticipants() {
