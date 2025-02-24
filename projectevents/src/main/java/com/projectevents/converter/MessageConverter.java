@@ -6,13 +6,15 @@ import com.projectevents.entity.Message;
 public class MessageConverter {
 
     public static MessageDTO entityToDTO(Message message) {
-        return new MessageDTO(
-            message.getMessageId(),
-            message.getContent(),
-            message.getTimestamp(),
-            message.getSender() != null ? message.getSender().getId() : null,
-            message.getChat() != null ? message.getChat().getChatId() : null
-        );
+    	return new MessageDTO(
+    		    message.getMessageId(),
+    		    message.getContent(),
+    		    message.getTimestamp(),
+    		    message.getSender() != null ? message.getSender().getId() : null,
+    		    message.getSender() != null ? message.getSender().getUsername() : null, 
+    		    message.getChat() != null ? message.getChat().getChatId() : null
+    		);
+
     }
 
     public static Message dtoToEntity(MessageDTO messageDTO) {

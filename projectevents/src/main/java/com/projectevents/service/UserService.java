@@ -2,20 +2,29 @@ package com.projectevents.service;
 
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.projectevents.dto.UserDTO;
 import com.projectevents.entity.User;
 import com.projectevents.repository.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class UserService {  
+public class UserService {
 
     @Autowired
     private UserRepository userRepository;
-
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+    
     public UserDTO createUser(UserDTO userDTO) {
         if (userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
             throw new UsernameAlreadyExistsException("Username already exists");
@@ -77,5 +86,4 @@ public class UserService {
             .map(User::getId)
             .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
     }
-
 }

@@ -23,6 +23,7 @@ public class MainEventController {
     @PostMapping
     public ResponseEntity<MainEventDTO> createMainEvent(@RequestBody MainEventDTO eventDTO) {
         System.out.println("Received Event DTO: " + eventDTO);
+        eventDTO.setChatId(null);
         MainEventDTO savedEvent = mainEventService.createMainEvent(eventDTO);
         return ResponseEntity.ok(savedEvent);
     }
@@ -46,11 +47,21 @@ public class MainEventController {
     public ResponseEntity<List<MainEventDTO>> getAllMainEvents() {
         List<MainEventDTO> events = mainEventService.findAllEvents()
             .stream()
-            .map(event -> new MainEventDTO(event.getEventId(), event.getName(), event.getLocation(), event.getMaxParticipants(),
-                    event.getChatId(), event.getGameTypeId(), event.getEventDate(), event.getEventTime(), event.getDescription(),event.getCreatorId()))
-            .collect(Collectors.toList());
+            .map(event -> new MainEventDTO(
+                    event.getEventId(), 
+                    event.getName(), 
+                    event.getLocation(), 
+                    event.getMaxParticipants(),
+                    event.getGameTypeId(), 
+                    event.getChatId(), 
+                    event.getEventDate(), 
+                    event.getEventTime(),
+                    event.getDescription(),
+                    event.getCreatorId(),
+                    event.getCurrentParticipants())) .collect(Collectors.toList());
         return ResponseEntity.ok(events);
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<MainEventDTO> updateMainEvent(@PathVariable Long id, @RequestBody MainEventDTO mainEventDTO) {

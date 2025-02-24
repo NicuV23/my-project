@@ -16,9 +16,9 @@ public class User {
 
     @Column(length = 50, nullable = false)
     private String password;
-
-    @Column(length = 50)
-    private String email;
+    
+    @Column(unique = true, nullable = false)
+    private String email; 
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

@@ -1,61 +1,41 @@
 package com.projectevents.dto;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class MessageDTO {
     private Long id;
     private String content;
-    private Date timestamp;
-    public Long senderId; 
-    public Long chatId; 
+    private LocalDateTime timestamp;
+    private Long senderId;
+    private String senderUsername; 
+    private Long chatId;
 
     public MessageDTO() {}
 
-    public MessageDTO(Long id, String content, Date timestamp, Long senderId, Long chatId) {
+    public MessageDTO(Long id, String content, LocalDateTime timestamp, Long senderId, String senderUsername, Long chatId) {
         this.id = id;
         this.content = content;
         this.timestamp = timestamp;
         this.senderId = senderId;
+        this.senderUsername = senderUsername;
         this.chatId = chatId;
     }
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getContent() { return content; }
+    public void setContent(String content) { this.content = content; }
 
-    public String getContent() {
-        return content;
-    }
+    public LocalDateTime getTimestamp() { return timestamp; }
+    public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
 
-   public  void setContent(String content) {
-        this.content = content;
-    }
+    public Long getSenderId() { return senderId; }
+    public void setSenderId(Long senderId) { this.senderId = senderId; }
 
-    public Date getTimestamp() {
-        return timestamp;
-    }
+    public String getSenderUsername() { return senderUsername; }
+    public void setSenderUsername(String senderUsername) { this.senderUsername = senderUsername; }
 
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
-    }
-
-   public Long getSenderId() {
-        return senderId;
-    }
-
-    public void setSenderId(Long senderId) {
-        this.senderId = senderId;
-    }
-
-    public Long getChatId() {
-        return chatId;
-    }
-
-    public void setChatId(Long chatId) {
-        this.chatId = chatId;
-    }
+    public Long getChatId() { return chatId; }
+    public void setChatId(Long chatId) { this.chatId = chatId; }
 }

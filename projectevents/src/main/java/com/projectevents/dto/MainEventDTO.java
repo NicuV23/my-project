@@ -10,6 +10,7 @@ public class MainEventDTO {
     private Integer maxParticipants;
     private LocalDate eventDate;
     private LocalTime eventTime;
+     private Integer currentParticipants;
     private String description;
     private Long gameTypeId;
     private Long chatId;
@@ -18,33 +19,38 @@ public class MainEventDTO {
     public MainEventDTO() {}
 
     public MainEventDTO(Long eventId, String name, String location, Integer maxParticipants, 
-                        Long gameTypeId, Long chatId, LocalDate eventDate, LocalTime eventTime, 
-                        String description, Long creatorId) {
-        this.eventId = eventId;
-        this.name = name;
-        this.location = location;
-        this.maxParticipants = maxParticipants;
-        this.gameTypeId = gameTypeId;
-        this.chatId = chatId;
-        this.eventDate = eventDate;
-        this.eventTime = eventTime;
-        this.description = description;
-        this.creatorId = creatorId;
-    }
+            Long gameTypeId, Long chatId, LocalDate eventDate, LocalTime eventTime, 
+            String description, Long creatorId) {
+this.eventId = eventId;
+this.name = name;
+this.location = location;
+this.maxParticipants = maxParticipants;
+this.gameTypeId = gameTypeId;
+this.chatId = chatId;
+this.eventDate = eventDate;
+this.eventTime = eventTime;
+this.description = description;
+this.creatorId = creatorId;
+this.currentParticipants = 0; 
+}
 
-    public MainEventDTO(String name, String location, Integer maxParticipants, 
-                        Long gameTypeId, Long chatId, LocalDate eventDate, LocalTime eventTime, 
-                        String description, Long creatorId) {
-        this.name = name;
-        this.location = location;
-        this.maxParticipants = maxParticipants;
-        this.gameTypeId = gameTypeId;
-        this.chatId = chatId;
-        this.eventDate = eventDate;
-        this.eventTime = eventTime;
-        this.description = description;
-        this.creatorId = creatorId;
-    }
+
+    public MainEventDTO(Long eventId, String name, String location, Integer maxParticipants, 
+            Long gameTypeId, Long chatId, LocalDate eventDate, LocalTime eventTime, 
+            String description, Long creatorId, Integer currentParticipants) {
+this.eventId = eventId;
+this.name = name;
+this.location = location;
+this.maxParticipants = maxParticipants;
+this.gameTypeId = gameTypeId;
+this.chatId = chatId;
+this.eventDate = eventDate;
+this.eventTime = eventTime;
+this.description = description;
+this.creatorId = creatorId;
+this.currentParticipants = currentParticipants;
+}
+
 
     public Long getEventId() { return eventId; }
     public void setEventId(Long eventId) { this.eventId = eventId; }
@@ -75,4 +81,13 @@ public class MainEventDTO {
 
     public Long getCreatorId() { return creatorId; }
     public void setCreatorId(Long creatorId) { this.creatorId = creatorId; }
+
+    public Integer getCurrentParticipants() {
+        return currentParticipants;
+    }
+
+    public void setCurrentParticipants(Integer currentParticipants) {
+        this.currentParticipants = currentParticipants;
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.projectevents.entity;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import jakarta.persistence.*;
 
@@ -23,7 +24,7 @@ public class Message {
 
     @Column
     @Temporal(TemporalType.TIMESTAMP)
-    private Date timestamp;
+    private LocalDateTime timestamp; 
 
     public Message() {}
 
@@ -60,11 +61,6 @@ public class Message {
         this.chat = chat;
     }
 
-    public Date getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
-    }
+    public LocalDateTime getTimestamp() { return timestamp; } 
+    public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; } 
 }
