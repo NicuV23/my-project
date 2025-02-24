@@ -48,13 +48,12 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.POST, "/api/register/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/login/**").permitAll()
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .anyRequest().permitAll())
+                .requestMatchers(HttpMethod.POST, "/api/register/**", "/api/login/**").permitAll() 
+                .anyRequest().authenticated()) 
             .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
             .build();
     }
+
 
    
 }
