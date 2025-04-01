@@ -77,6 +77,8 @@ public class AuthController {
             this.password = password;
         }
     }
+    
+    //afara
 
     static class AuthResponse {
         private final String jwt;
